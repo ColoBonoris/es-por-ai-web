@@ -1,14 +1,23 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { SlidersHorizontal } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { SearchBar } from "@/components/forms/search-bar";
-import { MockMap } from "@/components/places/mock-map";
 import { PlaceCard } from "@/components/places/place-card";
+import { EmptyState } from "@/components/ui/empty-state";
 import { FilterChip } from "@/components/ui/filter-chip";
 import { placeService } from "@/services/place-service";
 import type { AccessibilityFeature, Place } from "@/types/domain";
+
+const LeafletMap = dynamic(
+  () => import("@/components/places/leaflet-map").then((mod) => mod.LeafletMap),
+  {
+    ssr: false,
+    loading: () => <div className="leaflet-map leaflet-map--loading">Cargando mapa...</div>
+  }
+);
 
 export function MapScreen() {
   const [places, setPlaces] = useState<Place[]>([]);
@@ -59,7 +68,7 @@ export function MapScreen() {
       <header className="page-header">
         <p className="badge badge--accent">Mapa</p>
         <h1>Explorar lugares</h1>
-        <p>Mapa mockeado con filtros accesibles y lista equivalente de resultados.</p>
+        <p>Mapa Leaflet con filtros accesibles y lista equivalente de resultados.</p>
       </header>
 
       <div className="map-layout">
@@ -102,7 +111,7 @@ export function MapScreen() {
             </div>
           </section>
 
-          <MockMap
+          <LeafletMap
             places={filteredPlaces}
             selectedPlaceId={selectedPlaceId}
             onSelectPlace={setSelectedPlaceId}
@@ -117,9 +126,16 @@ export function MapScreen() {
             </div>
           </div>
           <div className="place-list">
-            {filteredPlaces.map((place) => (
-              <PlaceCard key={place.id} place={place} compact />
-            ))}
+            {filteredPlaces.length > 0 ? (
+              filteredPlaces.map((place) => (
+                <PlaceCard key={place.id} place={place} compact />
+              ))
+            ) : (
+              <EmptyState
+                title="No hay resultados"
+                description="Probá quitando filtros o usando otra búsqueda."
+              />
+            )}
           </div>
         </aside>
       </div>

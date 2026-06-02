@@ -1,6 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
+import { useId } from "react";
 
 interface SearchBarProps {
   value: string;
@@ -15,14 +16,16 @@ export function SearchBar({
   placeholder = "Buscar lugares...",
   label = "Buscar"
 }: SearchBarProps) {
+  const inputId = useId();
+
   return (
     <div className="search-bar">
       <Search aria-hidden="true" className="search-bar__icon" />
-      <label className="sr-only" htmlFor="global-search">
+      <label className="sr-only" htmlFor={inputId}>
         {label}
       </label>
       <input
-        id="global-search"
+        id={inputId}
         type="search"
         value={value}
         placeholder={placeholder}

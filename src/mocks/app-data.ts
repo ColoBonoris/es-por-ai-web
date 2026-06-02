@@ -84,7 +84,7 @@ export const seedPlaces: Place[] = [
     badges: ["vegetarian", "pet_friendly", "wheelchair"],
     verified: true,
     distance: "A 8 cuadras",
-    mapPosition: { top: "30%", left: "40%" }
+    coordinates: { lat: -34.92145, lng: -57.95453 }
   },
   {
     id: "parrilla-del-centro",
@@ -105,7 +105,7 @@ export const seedPlaces: Place[] = [
     badges: ["gluten_free"],
     verified: true,
     distance: "A 1.2 km",
-    mapPosition: { top: "50%", left: "60%" }
+    coordinates: { lat: -34.9186, lng: -57.9488 }
   },
   {
     id: "verde-natural",
@@ -126,7 +126,7 @@ export const seedPlaces: Place[] = [
     badges: ["vegetarian", "vegan", "gluten_free"],
     verified: false,
     distance: "A 900 m",
-    mapPosition: { top: "40%", left: "25%" }
+    coordinates: { lat: -34.9144, lng: -57.9538 }
   },
   {
     id: "panaderia-artesanal",
@@ -147,7 +147,7 @@ export const seedPlaces: Place[] = [
     badges: ["gluten_free"],
     verified: true,
     distance: "A 650 m",
-    mapPosition: { top: "60%", left: "45%" }
+    coordinates: { lat: -34.9266, lng: -57.9603 }
   },
   {
     id: "bar-la-esquina",
@@ -168,7 +168,7 @@ export const seedPlaces: Place[] = [
     badges: ["pet_friendly"],
     verified: false,
     distance: "A 1.8 km",
-    mapPosition: { top: "35%", left: "70%" }
+    coordinates: { lat: -34.9127, lng: -57.9468 }
   }
 ];
 

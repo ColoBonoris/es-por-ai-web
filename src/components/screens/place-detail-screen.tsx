@@ -1,11 +1,11 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, Heart, MapPin, Navigation, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { MockMap } from "@/components/places/mock-map";
 import { ReviewCard } from "@/components/places/review-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,10 +16,23 @@ import { placeService } from "@/services/place-service";
 import { reviewService } from "@/services/review-service";
 import type { Place, Review } from "@/types/domain";
 
+const LeafletMap = dynamic(
+  () => import("@/components/places/leaflet-map").then((mod) => mod.LeafletMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="leaflet-map leaflet-map--compact leaflet-map--loading">
+        Cargando mapa...
+      </div>
+    )
+  }
+);
+
 export function PlaceDetailScreen({ placeId }: { placeId: string }) {
   const [place, setPlace] = useState<Place | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [shareMessage, setShareMessage] = useState("");
 
   useEffect(() => {
     async function loadDetail() {
@@ -45,6 +58,27 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
       ...place,
       isFavorite
     });
+  }
+
+  async function sharePlace() {
+    if (!place) {
+      return;
+    }
+
+    const shareUrl = window.location.href;
+
+    if (navigator.share) {
+      await navigator.share({
+        title: place.name,
+        text: `Mirá ${place.name} en Es por AI.`,
+        url: shareUrl
+      });
+      setShareMessage("Lugar compartido.");
+      return;
+    }
+
+    await navigator.clipboard.writeText(shareUrl);
+    setShareMessage("Link copiado al portapapeles.");
   }
 
   if (!isLoading && !place) {
@@ -137,12 +171,24 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
           </div>
           <p>{place.hours}</p>
           <div className="button-row">
-            <Button type="button" variant="ghost" icon={<Navigation aria-hidden="true" size={18} />}>
-              Cómo ir
-            </Button>
-            <Button type="button" variant="ghost" icon={<ExternalLink aria-hidden="true" size={18} />}>
-              Abrir en Maps
-            </Button>
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${place.coordinates.lat},${place.coordinates.lng}`}
+              target="_blank"
+              rel="noreferrer"
+              className="button button--ghost"
+            >
+              <Navigation aria-hidden="true" size={18} />
+              <span>Cómo ir</span>
+            </a>
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${place.coordinates.lat},${place.coordinates.lng}`}
+              target="_blank"
+              rel="noreferrer"
+              className="button button--ghost"
+            >
+              <ExternalLink aria-hidden="true" size={18} />
+              <span>Abrir en Maps</span>
+            </a>
             <Button
               type="button"
               variant={place.isFavorite ? "secondary" : "ghost"}
@@ -151,11 +197,19 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
             >
               {place.isFavorite ? "Guardado" : "Guardar"}
             </Button>
-            <Button type="button" variant="ghost" icon={<Share2 aria-hidden="true" size={18} />}>
+            <Button
+              type="button"
+              variant="ghost"
+              icon={<Share2 aria-hidden="true" size={18} />}
+              onClick={() => void sharePlace()}
+            >
               Compartir
             </Button>
           </div>
-          <MockMap places={[place]} selectedPlaceId={place.id} />
+          <p className="status-message" aria-live="polite">
+            {shareMessage}
+          </p>
+          <LeafletMap places={[place]} selectedPlaceId={place.id} compact />
         </aside>
       </div>
     </div>

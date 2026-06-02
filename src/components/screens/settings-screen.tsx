@@ -1,23 +1,71 @@
 "use client";
 
+import { Bell, Check, ChevronRight, Palette, Shield, Smartphone } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { FilterChip } from "@/components/ui/filter-chip";
 import { getFeatureLabel } from "@/mocks/app-data";
 import { placeService } from "@/services/place-service";
 import { userService } from "@/services/user-service";
 import type {
   AccessibilityFeature,
+  PermissionPreference,
   ThemePreference,
   UserProfile,
   UserSettings
 } from "@/types/domain";
 
-const themeOptions: Array<{ value: ThemePreference; label: string }> = [
-  { value: "light", label: "Claro" },
-  { value: "dark", label: "Oscuro" },
-  { value: "high-contrast", label: "Alto contraste" }
+const themeOptions: Array<{
+  value: ThemePreference;
+  label: string;
+  description: string;
+  colors: {
+    background: string;
+    card: string;
+    accent: string;
+  };
+}> = [
+  {
+    value: "light",
+    label: "Claro",
+    description: "Tema cálido y minimalista con fondo beige.",
+    colors: { background: "#F7F4EF", card: "#FFFFFF", accent: "#D97706" }
+  },
+  {
+    value: "dark",
+    label: "Oscuro",
+    description: "Tema oscuro con acentos cálidos.",
+    colors: { background: "#1F1F1F", card: "#2F2F2F", accent: "#D97706" }
+  },
+  {
+    value: "high-contrast",
+    label: "Alto contraste",
+    description: "Máximo contraste para mejorar la lectura.",
+    colors: { background: "#000000", card: "#1A1A1A", accent: "#FFAA00" }
+  }
+];
+
+const permissionRows: Array<{
+  key: keyof PermissionPreference;
+  label: string;
+  description: string;
+}> = [
+  {
+    key: "location",
+    label: "Ubicación",
+    description: "Para ordenar lugares cercanos cuando lo habilites."
+  },
+  {
+    key: "camera",
+    label: "Cámara y fotos",
+    description: "Para sumar fotos a reseñas o lugares nuevos."
+  },
+  {
+    key: "notifications",
+    label: "Notificaciones",
+    description: "Para recibir avisos relevantes de la app."
+  }
 ];
 
 export function SettingsScreen() {
@@ -68,88 +116,169 @@ export function SettingsScreen() {
   }
 
   return (
-    <div className="page-stack">
+    <div className="page-stack settings-page">
       <header className="page-header">
         <p className="badge badge--accent">Configuración</p>
         <h1>Preferencias</h1>
-        <p>Personalizá tema, notificaciones y recomendaciones.</p>
+        <p>
+          Personalizá la apariencia, las notificaciones y las recomendaciones
+          que usa la app para priorizar lugares.
+        </p>
       </header>
 
-      <section className="form-section" aria-labelledby="theme-title">
-        <h2 id="theme-title">Tema</h2>
-        <div className="theme-options">
+      <section className="settings-section" aria-labelledby="theme-title">
+        <div className="settings-section__header">
+          <Palette aria-hidden="true" />
+          <h2 id="theme-title">Apariencia</h2>
+        </div>
+        <fieldset className="settings-card theme-picker">
+          <legend className="sr-only">Elegí el tema visual</legend>
           {themeOptions.map((theme) => (
-            <FilterChip
+            <label
               key={theme.value}
-              label={theme.label}
-              selected={profile.settings.theme === theme.value}
+              className={`theme-choice ${
+                profile.settings.theme === theme.value ? "is-selected" : ""
+              }`}
+            >
+              <input
+                className="sr-only"
+                type="radio"
+                name="theme"
+                value={theme.value}
+                checked={profile.settings.theme === theme.value}
+                onChange={() =>
+                  void updateSettings({
+                    ...profile.settings,
+                    theme: theme.value
+                  })
+                }
+              />
+              <span className="theme-choice__control" aria-hidden="true">
+                {profile.settings.theme === theme.value ? <Check /> : null}
+              </span>
+              <span className="theme-choice__swatches" aria-hidden="true">
+                <span
+                  className="theme-choice__swatch"
+                  style={{ backgroundColor: theme.colors.background }}
+                />
+                <span
+                  className="theme-choice__swatch"
+                  style={{ backgroundColor: theme.colors.card }}
+                />
+                <span
+                  className="theme-choice__swatch"
+                  style={{ backgroundColor: theme.colors.accent }}
+                />
+              </span>
+              <span className="theme-choice__copy">
+                <strong>{theme.label}</strong>
+                <span>{theme.description}</span>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      </section>
+
+      <section className="settings-section" aria-labelledby="notifications-title">
+        <div className="settings-section__header">
+          <Bell aria-hidden="true" />
+          <h2 id="notifications-title">Notificaciones</h2>
+        </div>
+        <div className="settings-card settings-card--list">
+          <div className="settings-row">
+            <div>
+              <strong>Nuevas reseñas</strong>
+              <p>Recibí novedades de los lugares que seguís o marcaste.</p>
+            </div>
+            <SettingsSwitch
+              checked={profile.settings.notifications.reviews}
+              label="Activar notificaciones de nuevas reseñas"
               onToggle={() =>
                 void updateSettings({
                   ...profile.settings,
-                  theme: theme.value
+                  notifications: {
+                    ...profile.settings.notifications,
+                    reviews: !profile.settings.notifications.reviews
+                  }
                 })
               }
             />
-          ))}
-        </div>
-      </section>
-
-      <section className="settings-list" aria-labelledby="notifications-title">
-        <h2 id="notifications-title">Notificaciones</h2>
-        <div className="setting-row">
-          <div>
-            <strong>Reseñas</strong>
-            <p>Recibir novedades sobre lugares reseñados.</p>
           </div>
-          <Button
-            type="button"
-            variant={profile.settings.notifications.reviews ? "secondary" : "ghost"}
-            onClick={() =>
-              void updateSettings({
-                ...profile.settings,
-                notifications: {
-                  ...profile.settings.notifications,
-                  reviews: !profile.settings.notifications.reviews
-                }
-              })
-            }
-          >
-            {profile.settings.notifications.reviews ? "Activado" : "Desactivado"}
-          </Button>
-        </div>
-        <div className="setting-row">
-          <div>
-            <strong>Recomendaciones</strong>
-            <p>Recibir sugerencias mockeadas de lugares.</p>
-          </div>
-          <Button
-            type="button"
-            variant={profile.settings.notifications.recommendations ? "secondary" : "ghost"}
-            onClick={() =>
-              void updateSettings({
-                ...profile.settings,
-                notifications: {
-                  ...profile.settings.notifications,
-                  recommendations: !profile.settings.notifications.recommendations
-                }
-              })
-            }
-          >
-            {profile.settings.notifications.recommendations ? "Activado" : "Desactivado"}
-          </Button>
-        </div>
-      </section>
-
-      <section className="form-section" aria-labelledby="preferences-title">
-        <h2 id="preferences-title">Preferencias de recomendación</h2>
-        <div className="chip-row">
-          {features.map((feature) => (
-            <FilterChip
-              key={feature.id}
-              label={getFeatureLabel(feature.id)}
-              selected={profile.preferences.accessibilityFeatures.includes(feature.id)}
-              onToggle={() => void togglePreference(feature.id)}
+          <div className="settings-row">
+            <div>
+              <strong>Recomendaciones personalizadas</strong>
+              <p>Sugerencias mockeadas según tus preferencias guardadas.</p>
+            </div>
+            <SettingsSwitch
+              checked={profile.settings.notifications.recommendations}
+              label="Activar recomendaciones personalizadas"
+              onToggle={() =>
+                void updateSettings({
+                  ...profile.settings,
+                  notifications: {
+                    ...profile.settings.notifications,
+                    recommendations: !profile.settings.notifications.recommendations
+                  }
+                })
+              }
             />
+          </div>
+        </div>
+      </section>
+
+      <section className="settings-section" aria-labelledby="preferences-title">
+        <div className="settings-section__header">
+          <Shield aria-hidden="true" />
+          <h2 id="preferences-title">Preferencias de recomendación</h2>
+        </div>
+        <div className="settings-card">
+          <p className="settings-card__intro">
+            Estas preferencias ayudan a ordenar resultados y recomendaciones sin
+            ocultar el resto de los lugares.
+          </p>
+          <div className="chip-row">
+            {features.map((feature) => (
+              <FilterChip
+                key={feature.id}
+                label={getFeatureLabel(feature.id)}
+                selected={profile.preferences.accessibilityFeatures.includes(feature.id)}
+                onToggle={() => void togglePreference(feature.id)}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="settings-section" aria-labelledby="permissions-title">
+        <div className="settings-section__header">
+          <Smartphone aria-hidden="true" />
+          <h2 id="permissions-title">Permisos</h2>
+        </div>
+        <div className="settings-card settings-card--list">
+          {permissionRows.map((permission) => (
+            <Link
+              key={permission.key}
+              href="/permissions"
+              className="permission-row"
+              aria-label={`${permission.label}: ${
+                profile.settings.permissions[permission.key] ? "permitido" : "pendiente"
+              }. Revisar permisos`}
+            >
+              <span>
+                <strong>{permission.label}</strong>
+                <small>{permission.description}</small>
+              </span>
+              <span className="permission-row__meta">
+                <span
+                  className={`permission-status ${
+                    profile.settings.permissions[permission.key] ? "is-enabled" : ""
+                  }`}
+                >
+                  {profile.settings.permissions[permission.key] ? "Permitido" : "Pendiente"}
+                </span>
+                <ChevronRight aria-hidden="true" />
+              </span>
+            </Link>
           ))}
         </div>
       </section>
@@ -158,5 +287,27 @@ export function SettingsScreen() {
         {message}
       </p>
     </div>
+  );
+}
+
+interface SettingsSwitchProps {
+  checked: boolean;
+  label: string;
+  onToggle: () => void;
+}
+
+function SettingsSwitch({ checked, label, onToggle }: SettingsSwitchProps) {
+  return (
+    <button
+      type="button"
+      className="settings-switch"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      onClick={onToggle}
+    >
+      <span className="settings-switch__thumb" aria-hidden="true" />
+      <span className="sr-only">{checked ? "Activado" : "Desactivado"}</span>
+    </button>
   );
 }

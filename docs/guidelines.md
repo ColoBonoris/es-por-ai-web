@@ -1,73 +1,80 @@
 # Guidelines del proyecto
 
-## Alcance actual
+## Prioridad de la consigna
 
-- La app se implementa en `Next.js` con `TypeScript` usando App Router.
-- No hay backend real por ahora, así que los datos salen de `services` asíncronos conectados a `mocks`.
-- La autenticación es mockeada, pero la estructura ya contempla sesión por cookie y rutas protegidas.
-- Los estilos base, tokens visuales y estados interactivos viven en `src/app/globals.css`.
-- La base debe mantenerse full responsive desde mobile hasta desktop.
+La web debe demostrar buenas prácticas de usabilidad, accesibilidad y desarrollo frontend. Estas reglas son parte central de la entrega y tienen prioridad sobre preferencias visuales menores.
+
+- La arquitectura de información y la navegación deben permitir encontrar la información con facilidad.
+- La experiencia debe ser simple, consistente y usable en mobile, tablet y desktop.
+- El contenido multimedia debe ser accesible: imágenes con texto alternativo útil, controles alcanzables por teclado y alternativas cuando una interacción visual no alcance.
+- La implementación debe usar tecnologías recomendadas por W3C: HTML5 semántico, CSS, TypeScript/React y Web ARIA solo cuando complemente la semántica nativa.
+- La app debe apuntar a cumplir WCAG 2.2, validación de hojas de estilo y validación gramatical/semántica W3C según aplique.
+
+## Alcance V1
+
+- La app es una web/PWA en `Next.js` con `TypeScript` y App Router.
+- La v1 no tiene backend real: los datos salen de `services` asíncronos conectados a mocks.
+- Las acciones principales deben ser funcionales aunque mockeadas: auth, favoritos, reseñas, preferencias, permisos, alta de lugares y recomendaciones de IAn por reglas simples.
+- La sesión se simula con cookie HTTP-only para conservar una estructura cercana a backend real.
+- El mapa usa Leaflet con datos mockeados y coordenadas reales alrededor de La Plata.
+- La IA real queda fuera de v1; IAn funciona como placeholder mockeado.
 
 ## Principios de desarrollo
 
-- Construir componentes semánticos y reutilizables antes de duplicar layouts por pantalla.
-- Mantener la lógica de acceso a datos en `src/services` para poder reemplazar mocks por APIs reales sin rehacer las vistas.
-- Centralizar colores, tipografía, espaciados, radios, sombras y estados de foco en variables globales.
-- Priorizar HTML nativo antes de agregar complejidad con ARIA; usar ARIA para complementar, no para reemplazar semántica.
-- Dejar cada pantalla pensada para teclado, lector de pantalla y resize desde el arranque.
+- Mantener la lógica de datos en `src/services` para poder reemplazar mocks por endpoints reales sin rehacer pantallas.
+- Centralizar contratos compartidos en tipos (`src/types/domain.ts` y `src/types/api.ts`).
+- Evitar lógica de negocio escondida en componentes visuales.
+- Usar componentes reutilizables para botones, inputs, chips, cards, reseñas, navegación y mapas.
+- Mantener estilos globales por capas: tokens, base, componentes y pantallas.
+- No agregar librerías pesadas sin que resuelvan una necesidad clara de la v1.
 
-## Reglas de accesibilidad a cumplir
+## Accesibilidad
 
-- Respetar principios de usabilidad web con arquitectura de información clara y navegación simple.
-- Garantizar contenidos y multimedia accesibles.
-- Usar tecnologías recomendadas por W3C: HTML5, CSS y Web ARIA cuando aporte valor.
-- Apuntar a cumplimiento WCAG 2.2 durante la implementación y en la revisión final.
-- Validar estructura semántica, foco visible, contraste, orden de tabulación, nombres accesibles y mensajes de error.
+- Cada página debe tener un único `h1`.
+- La navegación principal debe usar `nav`, `aria-label` y `aria-current` cuando corresponda.
+- Toda acción debe poder ejecutarse con teclado.
+- Inputs, textareas y controles deben tener `label` asociado.
+- Los errores de formularios deben tener texto claro y ser anunciables con `aria-live` cuando aplique.
+- Los chips seleccionables deben exponer estado con `aria-pressed`.
+- El foco visible no debe ocultarse.
+- El contraste debe ser suficiente en tema claro, oscuro y alto contraste.
+- El mapa debe tener una lista de resultados equivalente para no depender solo de interacción visual.
+- La app debe respetar `prefers-reduced-motion`.
 
-## Checklist base por pantalla
+## Responsive
 
-- Debe existir un único `h1` por página.
-- Toda acción debe ser alcanzable por teclado.
-- Inputs deben tener `label` asociado y mensajes de error anunciables.
-- El foco visible no puede perderse ni desactivarse.
-- El contraste de texto e interfaz debe ser suficiente.
-- La UI debe funcionar correctamente en mobile, tablet y desktop.
-- Las imágenes informativas deben incluir `alt`; las decorativas deben omitirse del árbol accesible.
+- La interfaz debe funcionar desde 320px de ancho.
+- Mobile usa bottom navigation.
+- Desktop usa sidebar/top navigation.
+- No debe haber texto solapado, botones truncados ni tarjetas que rompan layout.
+- Formularios largos deben seguir siendo legibles y navegables en mobile.
 
-## Arquitectura inicial
+## Arquitectura
 
-- `src/app`: rutas y layout global.
-- `src/components`: componentes de interfaz.
-- `src/providers`: providers del cliente, como auth.
-- `src/services`: capa de acceso a datos.
-- `src/mocks`: datos mockeados.
-- `src/lib`: utilidades compartidas, como sesión.
+- `src/app`: rutas, layout global y API routes mock de auth.
+- `src/components`: componentes visuales, pantallas y shell de navegación.
+- `src/services`: capa de datos mockeada y reemplazable por backend.
+- `src/mocks`: datos seed.
+- `src/types`: contratos de dominio y API.
+- `src/styles`: tokens, base, componentes y estilos de pantallas.
+- `docs/api-contract.md`: contrato backend v1.
 
-## Qué pasar desde Figma para arrancar las pantallas
+## Checklist antes de cerrar una pantalla
 
-Lo más útil:
+- Tiene estructura semántica clara.
+- Tiene estado de carga, vacío, error o éxito cuando corresponde.
+- Funciona con teclado.
+- Funciona en mobile y desktop.
+- No depende solo de color para comunicar estado.
+- Imágenes informativas tienen `alt`.
+- Formularios tienen labels, validación mínima y mensajes claros.
+- Los datos salen de services, no de arrays locales dentro de la pantalla salvo UI estática.
 
-- Link al archivo o al modo Dev de Figma.
-- Frames de cada pantalla en desktop y mobile.
-- Sistema de colores, tipografía, espaciados y radios.
-- Estados de componentes: hover, focus, disabled, error, success.
-- Assets exportables: SVG, PNG, íconos, ilustraciones, logos.
-- Copys finales o al menos textos provisionales por pantalla.
-- Reglas de comportamiento responsive si ya están definidas.
+## Validaciones recomendadas
 
-También sirve:
-
-- Capturas de pantalla cuando necesitemos contexto rápido.
-- Código exportado de Figma Make como referencia visual o estructural.
-
-Sirve menos si viene solo:
-
-- Código exportado sin tokens, sin medidas y sin aclaraciones de comportamiento.
-
-## Próximo paso recomendado
-
-Cuando quieras empezar con las pantallas, pasame primero el link de Figma y, si podés, también:
-
-- una captura por pantalla,
-- la lista de vistas a construir,
-- y cualquier regla especial de responsive o accesibilidad que ya te hayan pedido.
+- `npm run typecheck`
+- `npm run lint`
+- `npm run build`
+- Navegación manual por teclado.
+- Revisión responsive de `/home`, `/map`, `/places/[placeId]`, `/places/[placeId]/review`, `/places/new`, `/settings`.
+- Revisión de contraste con tema claro, oscuro y alto contraste.

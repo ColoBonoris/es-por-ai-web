@@ -29,7 +29,7 @@
   --space-6: 24px;
   --space-7: 32px;
   --space-8: 48px;
-  --font-body: Inter, "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
   --content-width: 1180px;
   --mobile-nav-height: 72px;
 }

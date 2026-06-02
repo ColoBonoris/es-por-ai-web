@@ -21,6 +21,7 @@ export function AddPlaceScreen() {
   const [selectedFeatures, setSelectedFeatures] = useState<AccessibilityFeature[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function toggleFeature(feature: AccessibilityFeature) {
@@ -33,23 +34,37 @@ export function AddPlaceScreen() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setMessage("");
+    setError("");
+
+    if (!name.trim() || !address.trim() || !category) {
+      setError("Completá nombre, dirección y categoría para enviar el lugar.");
+      return;
+    }
+
     setIsSubmitting(true);
-    const submission = await placeService.submitPlace({
-      name,
-      address,
-      category,
-      description,
-      badges: selectedFeatures,
-      images
-    });
-    setMessage(`"${submission.name}" quedó pendiente de aprobación.`);
-    setName("");
-    setAddress("");
-    setCategory("");
-    setDescription("");
-    setSelectedFeatures([]);
-    setImages([]);
-    setIsSubmitting(false);
+
+    try {
+      const submission = await placeService.submitPlace({
+        name,
+        address,
+        category,
+        description,
+        badges: selectedFeatures,
+        images
+      });
+      setMessage(`"${submission.name}" quedó pendiente de aprobación.`);
+      setName("");
+      setAddress("");
+      setCategory("");
+      setDescription("");
+      setSelectedFeatures([]);
+      setImages([]);
+    } catch {
+      setError("No se pudo enviar el lugar. Probá nuevamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -135,6 +150,9 @@ export function AddPlaceScreen() {
         </Button>
         <p className="status-message" aria-live="polite">
           {message}
+        </p>
+        <p className="field-error" aria-live="assertive">
+          {error}
         </p>
       </form>
     </div>

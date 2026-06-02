@@ -19,6 +19,7 @@ export function WriteReviewScreen({ placeId }: { placeId: string }) {
   const [text, setText] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [features, setFeatures] = useState<AccessibilityFeature[]>([]);
+  const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const accessibilityFeatures = placeService.getAccessibilityFeatures();
 
@@ -36,16 +37,29 @@ export function WriteReviewScreen({ placeId }: { placeId: string }) {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    setError("");
+
+    if (!text.trim()) {
+      setError("Escribí una reseña breve antes de publicarla.");
+      return;
+    }
+
     setIsSubmitting(true);
-    await reviewService.submitReview({
-      placeId,
-      rating,
-      text,
-      images,
-      accessibilityFeedback: features
-    });
-    router.push(`/places/${placeId}`);
-    router.refresh();
+
+    try {
+      await reviewService.submitReview({
+        placeId,
+        rating,
+        text,
+        images,
+        accessibilityFeedback: features
+      });
+      router.push(`/places/${placeId}`);
+      router.refresh();
+    } catch {
+      setError("No se pudo publicar la reseña. Probá nuevamente.");
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -101,6 +115,9 @@ export function WriteReviewScreen({ placeId }: { placeId: string }) {
         <Button type="submit" disabled={!text.trim() || isSubmitting}>
           {isSubmitting ? "Publicando..." : "Publicar reseña"}
         </Button>
+        <p className="field-error" aria-live="assertive">
+          {error}
+        </p>
       </form>
     </div>
   );

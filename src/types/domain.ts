@@ -29,9 +29,9 @@ export interface Place {
   badges: AccessibilityFeature[];
   verified: boolean;
   distance?: string;
-  mapPosition: {
-    top: string;
-    left: string;
+  coordinates: {
+    lat: number;
+    lng: number;
   };
   isFavorite?: boolean;
 }
