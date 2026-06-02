@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 
 import { AuthProvider } from "@/providers/auth-provider";
 
-import "@fontsource/inter/400.css";
-import "@fontsource/inter/500.css";
-import "@fontsource/inter/600.css";
-import "@fontsource/inter/700.css";
+import "@fontsource/inter/latin-400.css";
+import "@fontsource/inter/latin-500.css";
+import "@fontsource/inter/latin-600.css";
+import "@fontsource/inter/latin-700.css";
 import "leaflet/dist/leaflet.css";
 import "./globals.css";
 

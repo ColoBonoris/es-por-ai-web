@@ -280,6 +280,13 @@
   color: var(--accent);
 }
 
+.settings-section__header h2 {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
 .settings-card {
   display: grid;
   gap: var(--space-3);
@@ -300,8 +307,8 @@
 }
 
 .theme-picker {
-  gap: var(--space-2);
-  padding: var(--space-2);
+  gap: var(--space-3);
+  padding: var(--space-4);
 }
 
 .theme-choice {
@@ -309,7 +316,8 @@
   grid-template-columns: auto auto minmax(0, 1fr);
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-3);
+  min-height: 58px;
+  padding: 0;
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -321,7 +329,7 @@
 
 .theme-choice:hover,
 .theme-choice:focus-within {
-  background: var(--secondary);
+  background: color-mix(in srgb, var(--secondary), transparent 45%);
 }
 
 .theme-choice:hover {
@@ -334,55 +342,62 @@
 }
 
 .theme-choice.is-selected {
-  border-color: var(--accent);
-  background: var(--accent-soft);
+  border-color: transparent;
+  background: transparent;
 }
 
 .theme-choice__control {
+  position: relative;
   display: grid;
   place-items: center;
   width: 22px;
   height: 22px;
   border: 2px solid var(--border);
   border-radius: 999px;
-  color: #ffffff;
+  background: var(--card);
 }
 
 .theme-choice.is-selected .theme-choice__control {
   border-color: var(--accent);
-  background: var(--accent);
 }
 
-.theme-choice__control svg {
-  width: 14px;
-  height: 14px;
-  stroke-width: 3;
+.theme-choice.is-selected .theme-choice__control::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--accent);
 }
 
 .theme-choice__swatches {
   display: inline-flex;
   gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--card);
 }
 
 .theme-choice__swatch {
-  width: 24px;
-  height: 24px;
-  border: 1px solid rgba(31, 31, 31, 0.16);
-  border-radius: var(--radius-xs);
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
 }
 
 .theme-choice__copy {
   display: grid;
-  gap: 2px;
+  gap: 0;
+}
+
+.theme-choice__copy strong,
+.theme-choice__copy span {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.theme-choice__copy strong {
+  font-weight: 600;
 }
 
 .theme-choice__copy span {
   color: var(--muted);
-  font-size: 0.92rem;
 }
 
 .settings-row,
@@ -613,15 +628,6 @@
 
   .settings-page {
     max-width: 100%;
-  }
-
-  .theme-choice {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-
-  .theme-choice__swatches {
-    grid-column: 2;
-    width: max-content;
   }
 
   .settings-row,

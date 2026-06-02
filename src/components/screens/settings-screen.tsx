@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Check, ChevronRight, Palette, Shield, Smartphone } from "lucide-react";
+import { Bell, ChevronRight, Palette, Shield, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -117,14 +117,7 @@ export function SettingsScreen() {
 
   return (
     <div className="page-stack settings-page">
-      <header className="page-header">
-        <p className="badge badge--accent">Configuración</p>
-        <h1>Preferencias</h1>
-        <p>
-          Personalizá la apariencia, las notificaciones y las recomendaciones
-          que usa la app para priorizar lugares.
-        </p>
-      </header>
+      <h1 className="sr-only">Configuración</h1>
 
       <section className="settings-section" aria-labelledby="theme-title">
         <div className="settings-section__header">
@@ -154,7 +147,6 @@ export function SettingsScreen() {
                 }
               />
               <span className="theme-choice__control" aria-hidden="true">
-                {profile.settings.theme === theme.value ? <Check /> : null}
               </span>
               <span className="theme-choice__swatches" aria-hidden="true">
                 <span
