@@ -616,6 +616,46 @@ a.button {
   text-align: center;
 }
 
+.toast {
+  position: fixed;
+  left: var(--space-5);
+  right: var(--space-5);
+  bottom: calc(var(--mobile-nav-height) + var(--space-4));
+  z-index: 80;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--primary), transparent 70%);
+  border-radius: var(--radius-lg);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  box-shadow: var(--shadow);
+  font-weight: 600;
+  animation: toast-enter 160ms ease-out;
+}
+
+.toast svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 860px) {
   .app-shell {
     display: block;
@@ -672,6 +712,15 @@ a.button {
   .place-card__link {
     grid-template-columns: 112px minmax(0, 1fr);
     min-height: 128px;
+  }
+}
+
+@media (min-width: 861px) {
+  .toast {
+    left: auto;
+    right: var(--space-7);
+    bottom: var(--space-7);
+    margin: 0;
   }
 }
 

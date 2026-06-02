@@ -71,6 +71,7 @@ const permissionRows: Array<{
 export function SettingsScreen() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [message, setMessage] = useState("");
+  const [toastMessage, setToastMessage] = useState("");
   const features = placeService.getAccessibilityFeatures();
 
   useEffect(() => {
@@ -88,10 +89,42 @@ export function SettingsScreen() {
     }
   }, [profile]);
 
-  async function updateSettings(settings: UserSettings) {
+  useEffect(() => {
+    if (!toastMessage) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setToastMessage("");
+    }, 3200);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [toastMessage]);
+
+  async function updateSettings(
+    settings: UserSettings,
+    successMessage = "Configuración guardada."
+  ) {
     const nextProfile = await userService.updateSettings(settings);
     setProfile(nextProfile);
-    setMessage("Configuración guardada.");
+    setMessage(successMessage);
+  }
+
+  async function changeTheme(theme: (typeof themeOptions)[number]) {
+    if (!profile || profile.settings.theme === theme.value) {
+      return;
+    }
+
+    const successMessage = `Modo ${theme.label.toLowerCase()} activado.`;
+
+    await updateSettings(
+      {
+        ...profile.settings,
+        theme: theme.value
+      },
+      successMessage
+    );
+    setToastMessage(successMessage);
   }
 
   async function togglePreference(feature: AccessibilityFeature) {
@@ -139,15 +172,9 @@ export function SettingsScreen() {
                 name="theme"
                 value={theme.value}
                 checked={profile.settings.theme === theme.value}
-                onChange={() =>
-                  void updateSettings({
-                    ...profile.settings,
-                    theme: theme.value
-                  })
-                }
+                onChange={() => void changeTheme(theme)}
               />
-              <span className="theme-choice__control" aria-hidden="true">
-              </span>
+              <span className="theme-choice__control" aria-hidden="true" />
               <span className="theme-choice__swatches" aria-hidden="true">
                 <span
                   className="theme-choice__swatch"
@@ -278,6 +305,13 @@ export function SettingsScreen() {
       <p className="status-message" aria-live="polite">
         {message}
       </p>
+
+      {toastMessage ? (
+        <div className="toast" role="status" aria-live="polite" aria-atomic="true">
+          <Palette aria-hidden="true" />
+          <span>{toastMessage}</span>
+        </div>
+      ) : null}
     </div>
   );
 }
