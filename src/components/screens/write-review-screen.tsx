@@ -12,6 +12,8 @@ import { placeService } from "@/services/place-service";
 import { reviewService } from "@/services/review-service";
 import type { AccessibilityFeature, Place } from "@/types/domain";
 
+const requiredReviewError = "Escribí una reseña breve antes de publicarla.";
+
 export function WriteReviewScreen({ placeId }: { placeId: string }) {
   const router = useRouter();
   const [place, setPlace] = useState<Place | null>(null);
@@ -40,7 +42,7 @@ export function WriteReviewScreen({ placeId }: { placeId: string }) {
     setError("");
 
     if (!text.trim()) {
-      setError("Escribí una reseña breve antes de publicarla.");
+      setError(requiredReviewError);
       return;
     }
 
@@ -62,6 +64,9 @@ export function WriteReviewScreen({ placeId }: { placeId: string }) {
     }
   }
 
+  const reviewTextError = error === requiredReviewError ? error : undefined;
+  const formError = reviewTextError ? "" : error;
+
   return (
     <div className="page-stack">
       <header className="page-header">
@@ -70,7 +75,7 @@ export function WriteReviewScreen({ placeId }: { placeId: string }) {
         <p>{place ? `Contanos cómo fue tu experiencia en ${place.name}.` : "Cargando lugar..."}</p>
       </header>
 
-      <form className="form-page" onSubmit={handleSubmit}>
+      <form className="form-page" onSubmit={handleSubmit} noValidate>
         <section className="form-section" aria-labelledby="rating-title">
           <h2 id="rating-title">Calificación</h2>
           <StarRating
@@ -87,8 +92,14 @@ export function WriteReviewScreen({ placeId }: { placeId: string }) {
             id="review-text"
             label="Reseña"
             helperText="Mínimo sugerido: una o dos frases útiles."
+            error={reviewTextError}
             value={text}
-            onChange={(event) => setText(event.target.value)}
+            onChange={(event) => {
+              setText(event.target.value);
+              if (error === requiredReviewError) {
+                setError("");
+              }
+            }}
             required
           />
         </section>
@@ -112,11 +123,11 @@ export function WriteReviewScreen({ placeId }: { placeId: string }) {
           <PhotoUploadField label="Fotos de la reseña" images={images} onChange={setImages} />
         </section>
 
-        <Button type="submit" disabled={!text.trim() || isSubmitting}>
+        <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Publicando..." : "Publicar reseña"}
         </Button>
-        <p className="field-error" aria-live="assertive">
-          {error}
+        <p className="field-error" role="alert">
+          {formError}
         </p>
       </form>
     </div>

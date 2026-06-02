@@ -33,7 +33,7 @@ export function ForgotPasswordScreen() {
   }
 
   return (
-    <main id="main-content" className="auth-page">
+    <main id="main-content" className="auth-page" tabIndex={-1}>
       <section className="auth-panel" aria-labelledby="forgot-title">
         <div className="page-header">
           <h1 id="forgot-title">Recuperar contraseña</h1>
@@ -53,10 +53,10 @@ export function ForgotPasswordScreen() {
           <Button type="submit" fullWidth disabled={isSubmitting}>
             {isSubmitting ? "Enviando..." : "Enviar instrucciones"}
           </Button>
-          <p className="status-message" aria-live="polite">
+          <p className="status-message" role="status" aria-live="polite">
             {message}
           </p>
-          <p className="field-error" aria-live="assertive">
+          <p className="field-error" role="alert">
             {error}
           </p>
         </form>

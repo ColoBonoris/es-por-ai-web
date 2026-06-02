@@ -59,7 +59,13 @@ export function AIAssistantScreen() {
         <p>Hacé una pregunta simple y recibí sugerencias con lugares mockeados.</p>
       </header>
 
-      <section className="chat-window" aria-label="Conversación con IAn">
+      <section
+        className="chat-window"
+        aria-label="Conversación con IAn"
+        aria-live="polite"
+        aria-relevant="additions text"
+        aria-busy={isSubmitting}
+      >
         {messages.map((message) => (
           <article
             key={message.id}

@@ -1,7 +1,7 @@
 "use client";
 
 import L from "leaflet";
-import { useEffect } from "react";
+import { useEffect, useId } from "react";
 import {
   MapContainer,
   Marker,
@@ -27,6 +27,7 @@ export function LeafletMap({
   compact,
   onSelectPlace
 }: LeafletMapProps) {
+  const instructionsId = useId();
   const center = places[0]
     ? ([places[0].coordinates.lat, places[0].coordinates.lng] as [number, number])
     : DEFAULT_CENTER;
@@ -35,17 +36,18 @@ export function LeafletMap({
     <section
       className={compact ? "leaflet-map leaflet-map--compact" : "leaflet-map"}
       aria-label="Mapa interactivo de lugares"
+      aria-describedby={instructionsId}
     >
-      <p className="sr-only">
-        El mapa muestra marcadores de lugares. La lista de resultados al lado del mapa ofrece la
-        misma información para navegación accesible.
+      <p id={instructionsId} className="sr-only">
+        El mapa es una referencia visual con marcadores. Usá la lista de resultados equivalente
+        para abrir detalles y navegar sin depender del mapa.
       </p>
       <MapContainer
         center={center}
         zoom={compact ? 15 : 14}
-        scrollWheelZoom={!compact}
+        scrollWheelZoom={false}
         className="leaflet-map__canvas"
-        keyboard
+        keyboard={false}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

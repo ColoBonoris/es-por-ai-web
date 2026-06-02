@@ -55,7 +55,7 @@ export function RegisterScreen() {
   }
 
   return (
-    <main id="main-content" className="auth-page">
+    <main id="main-content" className="auth-page" tabIndex={-1}>
       <section className="auth-panel" aria-labelledby="register-title">
         <div className="page-header">
           <h1 id="register-title">Crear cuenta</h1>
@@ -109,7 +109,7 @@ export function RegisterScreen() {
           <Button type="submit" fullWidth disabled={isSubmitting}>
             {isSubmitting ? "Creando cuenta..." : "Crear cuenta"}
           </Button>
-          <p className="field-error" aria-live="assertive">
+          <p className="field-error" role="alert">
             {error}
           </p>
         </form>

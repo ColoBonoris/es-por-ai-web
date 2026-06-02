@@ -1,6 +1,7 @@
 "use client";
 
 import { Upload, X } from "lucide-react";
+import { useId, useState } from "react";
 
 import { IconButton } from "@/components/ui/icon-button";
 
@@ -18,26 +19,41 @@ export function PhotoUploadField({
   images,
   onChange
 }: PhotoUploadFieldProps) {
+  const helperId = useId();
+  const [announcement, setAnnouncement] = useState("");
+
   function addMockPhoto() {
     if (images.length >= 6) {
+      setAnnouncement("Ya cargaste el máximo de 6 fotos.");
       return;
     }
 
-    onChange([...images, `${mockPhoto}&mock=${images.length + 1}`]);
+    const nextImages = [...images, `${mockPhoto}&mock=${images.length + 1}`];
+    onChange(nextImages);
+    setAnnouncement(`Foto agregada. Hay ${nextImages.length} de 6 fotos cargadas.`);
+  }
+
+  function removePhoto(index: number) {
+    const nextImages = images.filter((_, itemIndex) => itemIndex !== index);
+    onChange(nextImages);
+    setAnnouncement(`Foto ${index + 1} quitada. Hay ${nextImages.length} de 6 fotos cargadas.`);
   }
 
   return (
-    <fieldset className="photo-field">
+    <fieldset className="photo-field" aria-describedby={helperId}>
       <legend>{label}</legend>
+      <p id={helperId} className="field-helper">
+        Podés cargar hasta 6 fotos. En esta v1 se agregan imágenes mockeadas.
+      </p>
       <div className="photo-grid">
         {images.map((image, index) => (
           <div key={image} className="photo-preview">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={image} alt={`Foto cargada ${index + 1}`} />
+            <img src={image} alt={`${label}, foto cargada ${index + 1}`} />
             <IconButton
               label={`Quitar foto ${index + 1}`}
               className="photo-preview__remove"
-              onClick={() => onChange(images.filter((_, itemIndex) => itemIndex !== index))}
+              onClick={() => removePhoto(index)}
             >
               <X aria-hidden="true" size={16} />
             </IconButton>
@@ -51,6 +67,9 @@ export function PhotoUploadField({
           </button>
         ) : null}
       </div>
+      <p className="sr-only" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </p>
     </fieldset>
   );
 }

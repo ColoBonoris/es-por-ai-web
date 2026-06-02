@@ -176,6 +176,7 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
               target="_blank"
               rel="noreferrer"
               className="button button--ghost"
+              aria-label={`Cómo ir a ${place.name}. Abre Google Maps en una pestaña nueva.`}
             >
               <Navigation aria-hidden="true" size={18} />
               <span>Cómo ir</span>
@@ -185,6 +186,7 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
               target="_blank"
               rel="noreferrer"
               className="button button--ghost"
+              aria-label={`Abrir ${place.name} en Google Maps en una pestaña nueva.`}
             >
               <ExternalLink aria-hidden="true" size={18} />
               <span>Abrir en Maps</span>
@@ -193,6 +195,7 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
               type="button"
               variant={place.isFavorite ? "secondary" : "ghost"}
               icon={<Heart aria-hidden="true" size={18} />}
+              aria-pressed={place.isFavorite}
               onClick={toggleFavorite}
             >
               {place.isFavorite ? "Guardado" : "Guardar"}
@@ -206,7 +209,7 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
               Compartir
             </Button>
           </div>
-          <p className="status-message" aria-live="polite">
+          <p className="status-message" role="status" aria-live="polite">
             {shareMessage}
           </p>
           <LeafletMap places={[place]} selectedPlaceId={place.id} compact />

@@ -17,7 +17,12 @@ export function PlaceCard({ place, compact, reason }: PlaceCardProps) {
     <article className={compact ? "place-card place-card--compact" : "place-card"}>
       <Link href={`/places/${place.id}`} className="place-card__link">
         <div className="place-card__image">
-          <Image src={place.image} alt={place.name} fill sizes="(max-width: 768px) 35vw, 220px" />
+          <Image
+            src={place.image}
+            alt={`Foto de ${place.name}`}
+            fill
+            sizes="(max-width: 768px) 35vw, 220px"
+          />
         </div>
         <div className="place-card__body">
           <div className="place-card__title-row">
@@ -58,7 +63,7 @@ export function PlaceCard({ place, compact, reason }: PlaceCardProps) {
       </Link>
 
       {place.isFavorite ? (
-        <div className="place-card__favorite" aria-label="Guardado en favoritos">
+        <div className="place-card__favorite" role="img" aria-label="Guardado en favoritos">
           <Heart aria-hidden="true" size={16} />
         </div>
       ) : null}

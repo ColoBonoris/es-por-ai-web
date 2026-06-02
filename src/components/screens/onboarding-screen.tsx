@@ -21,7 +21,7 @@ const slides = [
 
 export function OnboardingScreen() {
   return (
-    <main id="main-content" className="onboarding-page">
+    <main id="main-content" className="onboarding-page" tabIndex={-1}>
       <section className="onboarding-panel" aria-labelledby="onboarding-title">
         <div className="page-header">
           <p className="badge badge--accent">Es por AI</p>

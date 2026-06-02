@@ -62,6 +62,7 @@ export function MapScreen() {
 
     return matchesQuery && matchesCategory && matchesFeatures;
   });
+  const selectedPlace = filteredPlaces.find((place) => place.id === selectedPlaceId);
 
   return (
     <div className="page-stack">
@@ -116,6 +117,11 @@ export function MapScreen() {
             selectedPlaceId={selectedPlaceId}
             onSelectPlace={setSelectedPlaceId}
           />
+          <p className="sr-only" aria-live="polite" aria-atomic="true">
+            {selectedPlace
+              ? `${selectedPlace.name} seleccionado en el mapa. También está disponible en la lista de resultados.`
+              : ""}
+          </p>
         </div>
 
         <aside className="map-panel" aria-labelledby="map-results-title">

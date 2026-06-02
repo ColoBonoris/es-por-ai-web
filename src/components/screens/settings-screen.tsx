@@ -96,7 +96,7 @@ export function SettingsScreen() {
 
     const timeoutId = window.setTimeout(() => {
       setToastMessage("");
-    }, 3200);
+    }, 5000);
 
     return () => window.clearTimeout(timeoutId);
   }, [toastMessage]);
@@ -302,7 +302,7 @@ export function SettingsScreen() {
         </div>
       </section>
 
-      <p className="status-message" aria-live="polite">
+      <p className="status-message" role="status" aria-live="polite">
         {message}
       </p>
 

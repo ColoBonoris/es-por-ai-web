@@ -40,7 +40,7 @@ export function LoginScreen() {
   }
 
   return (
-    <main id="main-content" className="auth-page">
+    <main id="main-content" className="auth-page" tabIndex={-1}>
       <section className="auth-panel" aria-labelledby="login-title">
         <div className="page-header">
           <h1 id="login-title">Bienvenido</h1>
@@ -82,7 +82,7 @@ export function LoginScreen() {
           <p className="field-helper">
             Demo: <strong>demo@esporai.dev</strong> / <strong>Acceso123!</strong>
           </p>
-          <p className="field-error" aria-live="assertive">
+          <p className="field-error" role="alert">
             {error}
           </p>
         </form>

@@ -57,7 +57,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </IconButton>
         </header>
 
-        <main id="main-content" className="app-main">
+        <main id="main-content" className="app-main" tabIndex={-1}>
           {children}
         </main>
         <MobileBottomNav />

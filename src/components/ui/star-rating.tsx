@@ -1,10 +1,12 @@
 import { Star } from "lucide-react";
+import { useId } from "react";
 
 import { cn } from "@/lib/cn";
 
 interface StarRatingProps {
   value: number;
   label?: string;
+  name?: string;
   interactive?: boolean;
   onChange?: (value: number) => void;
 }
@@ -12,23 +14,31 @@ interface StarRatingProps {
 export function StarRating({
   value,
   label,
+  name,
   interactive = false,
   onChange
 }: StarRatingProps) {
+  const generatedName = useId();
+  const groupName = name ?? generatedName;
   const roundedValue = Math.round(value);
 
   if (interactive) {
     return (
-      <div className="star-rating" role="radiogroup" aria-label={label ?? "Calificación"}>
+      <fieldset className="star-rating star-rating--interactive">
+        <legend className="sr-only">{label ?? "Calificación"}</legend>
         {[1, 2, 3, 4, 5].map((star) => (
-          <button
+          <label
             key={star}
-            type="button"
-            className="star-rating__button"
-            aria-checked={value === star}
-            role="radio"
-            onClick={() => onChange?.(star)}
+            className="star-rating__option"
           >
+            <input
+              className="star-rating__input sr-only"
+              type="radio"
+              name={groupName}
+              value={star}
+              checked={value === star}
+              onChange={() => onChange?.(star)}
+            />
             <Star
               aria-hidden="true"
               className={cn(
@@ -37,9 +47,9 @@ export function StarRating({
               )}
             />
             <span className="sr-only">{star} estrellas</span>
-          </button>
+          </label>
         ))}
-      </div>
+      </fieldset>
     );
   }
 

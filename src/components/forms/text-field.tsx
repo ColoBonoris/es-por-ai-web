@@ -1,19 +1,45 @@
 import type { InputHTMLAttributes } from "react";
+import { useId } from "react";
 
 interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
+  helperText?: string;
   error?: string;
 }
 
-export function TextField({ id, label, error, ...props }: TextFieldProps) {
-  const errorId = error && id ? `${id}-error` : undefined;
+export function TextField({
+  id,
+  label,
+  helperText,
+  error,
+  "aria-describedby": ariaDescribedBy,
+  "aria-invalid": ariaInvalid,
+  ...props
+}: TextFieldProps) {
+  const generatedId = useId();
+  const fieldId = id ?? generatedId;
+  const helperId = helperText ? `${fieldId}-helper` : undefined;
+  const errorId = error ? `${fieldId}-error` : undefined;
+  const describedBy = [ariaDescribedBy, helperId, errorId]
+    .filter(Boolean)
+    .join(" ") || undefined;
 
   return (
     <div className="field">
-      <label htmlFor={id}>{label}</label>
-      <input id={id} aria-describedby={errorId} aria-invalid={!!error} {...props} />
+      <label htmlFor={fieldId}>{label}</label>
+      <input
+        id={fieldId}
+        aria-describedby={describedBy}
+        aria-invalid={error ? true : ariaInvalid}
+        {...props}
+      />
+      {helperText ? (
+        <p id={helperId} className="field-helper">
+          {helperText}
+        </p>
+      ) : null}
       {error ? (
-        <p id={errorId} className="field-error" aria-live="polite">
+        <p id={errorId} className="field-error" role="alert">
           {error}
         </p>
       ) : null}

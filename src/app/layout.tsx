@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { RouteFocus } from "@/components/app/route-focus";
 import { AuthProvider } from "@/providers/auth-provider";
 
 import "@fontsource/inter/latin-400.css";
@@ -25,6 +26,7 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Saltar al contenido principal
         </a>
+        <RouteFocus />
         <AuthProvider>
           {children}
         </AuthProvider>

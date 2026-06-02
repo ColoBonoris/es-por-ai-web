@@ -12,7 +12,7 @@ export default async function LoginPage() {
   }
 
   return (
-    <Suspense fallback={<main id="main-content" className="auth-page">Cargando...</main>}>
+    <Suspense fallback={<main id="main-content" className="auth-page" tabIndex={-1}>Cargando...</main>}>
       <LoginScreen />
     </Suspense>
   );

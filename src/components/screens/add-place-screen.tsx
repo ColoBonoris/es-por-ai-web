@@ -22,6 +22,7 @@ export function AddPlaceScreen() {
   const [images, setImages] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   function toggleFeature(feature: AccessibilityFeature) {
@@ -36,6 +37,7 @@ export function AddPlaceScreen() {
     event.preventDefault();
     setMessage("");
     setError("");
+    setHasTriedSubmit(true);
 
     if (!name.trim() || !address.trim() || !category) {
       setError("Completá nombre, dirección y categoría para enviar el lugar.");
@@ -60,12 +62,23 @@ export function AddPlaceScreen() {
       setDescription("");
       setSelectedFeatures([]);
       setImages([]);
+      setHasTriedSubmit(false);
     } catch {
       setError("No se pudo enviar el lugar. Probá nuevamente.");
     } finally {
       setIsSubmitting(false);
     }
   }
+
+  const nameError = hasTriedSubmit && !name.trim()
+    ? "Ingresá el nombre del lugar."
+    : undefined;
+  const addressError = hasTriedSubmit && !address.trim()
+    ? "Ingresá la dirección."
+    : undefined;
+  const categoryError = hasTriedSubmit && !category
+    ? "Elegí una categoría."
+    : undefined;
 
   return (
     <div className="page-stack">
@@ -79,13 +92,14 @@ export function AddPlaceScreen() {
         Verificado solo puede ser asignado por administración.
       </Badge>
 
-      <form className="form-page" onSubmit={handleSubmit}>
+      <form className="form-page" onSubmit={handleSubmit} noValidate>
         <section className="form-section" aria-labelledby="place-basic-title">
           <h2 id="place-basic-title">Información básica</h2>
           <div className="form-grid">
             <TextField
               id="place-name"
               label="Nombre del lugar"
+              error={nameError}
               value={name}
               onChange={(event) => setName(event.target.value)}
               required
@@ -93,23 +107,44 @@ export function AddPlaceScreen() {
             <TextField
               id="place-address"
               label="Dirección"
+              error={addressError}
               value={address}
               onChange={(event) => setAddress(event.target.value)}
               required
             />
           </div>
-          <fieldset className="photo-field">
+          <fieldset
+            className="photo-field"
+            aria-describedby={categoryError ? "place-category-error" : undefined}
+            aria-invalid={categoryError ? true : undefined}
+          >
             <legend>Categoría</legend>
             <div className="chip-row">
               {categories.map((item) => (
-                <FilterChip
+                <label
                   key={item}
-                  label={item}
-                  selected={category === item}
-                  onToggle={() => setCategory(item)}
-                />
+                  className={`filter-chip choice-chip ${
+                    category === item ? "filter-chip--selected" : ""
+                  }`}
+                >
+                  <input
+                    className="choice-chip__input sr-only"
+                    type="radio"
+                    name="place-category"
+                    value={item}
+                    checked={category === item}
+                    onChange={() => setCategory(item)}
+                    required
+                  />
+                  <span>{item}</span>
+                </label>
               ))}
             </div>
+            {categoryError ? (
+              <p id="place-category-error" className="field-error" role="alert">
+                {categoryError}
+              </p>
+            ) : null}
           </fieldset>
         </section>
 
@@ -142,16 +177,13 @@ export function AddPlaceScreen() {
           <PhotoUploadField label="Fotos del lugar" images={images} onChange={setImages} />
         </section>
 
-        <Button
-          type="submit"
-          disabled={!name.trim() || !address.trim() || !category || isSubmitting}
-        >
+        <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Enviando..." : "Enviar para aprobación"}
         </Button>
-        <p className="status-message" aria-live="polite">
+        <p className="status-message" role="status" aria-live="polite">
           {message}
         </p>
-        <p className="field-error" aria-live="assertive">
+        <p className="field-error" role="alert">
           {error}
         </p>
       </form>
