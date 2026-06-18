@@ -300,6 +300,35 @@ a.button {
   padding: 0 var(--space-4);
 }
 
+.field__input-wrap {
+  position: relative;
+}
+
+.field__input-wrap input {
+  padding-right: 48px;
+}
+
+.field__visibility-toggle {
+  position: absolute;
+  top: 50%;
+  right: var(--space-2);
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--muted);
+  transform: translateY(-50%);
+}
+
+.field__visibility-toggle:hover,
+.field__visibility-toggle:focus-visible {
+  color: var(--foreground);
+  background: var(--background);
+}
+
 .field textarea {
   min-height: 120px;
   padding: var(--space-3) var(--space-4);

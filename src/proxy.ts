@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 import { joinApiUrl } from "@/lib/api-url";
 import type { AuthUser } from "@/types/auth";
 
-const DEFAULT_API_BASE_URL = "http://localhost:3001/api/v1";
+const DEFAULT_API_BASE_URL = "http://localhost:3002/api/v1";
 
 interface AuthResponse {
   user: AuthUser | null;
@@ -49,9 +49,11 @@ async function getSessionUser(request: NextRequest) {
 }
 
 function getApiBaseUrl() {
+  const publicApiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   return (
     process.env.API_BASE_URL ??
-    process.env.NEXT_PUBLIC_API_BASE_URL ??
+    (publicApiBaseUrl?.startsWith("http") ? publicApiBaseUrl : undefined) ??
     DEFAULT_API_BASE_URL
   );
 }
