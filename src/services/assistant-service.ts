@@ -1,7 +1,12 @@
 import { suggestedQuestions } from "@/mocks/app-data";
-import type { AiMessage } from "@/types/domain";
-import { createMockId, waitForMock } from "@/services/mock-storage";
+import { apiFetch, jsonHeaders } from "@/services/api-client";
+import { createMockId } from "@/services/mock-storage";
 import { placeService } from "@/services/place-service";
+import type {
+  AssistantMessageRequest,
+  AssistantMessageResponse
+} from "@/types/api";
+import type { AiMessage } from "@/types/domain";
 
 export const assistantService = {
   getSuggestedQuestions() {
@@ -9,55 +14,71 @@ export const assistantService = {
   },
 
   async askIAn(question: string): Promise<AiMessage> {
-    await waitForMock();
-    const places = await placeService.getPlaces();
-    const normalizedQuestion = question.toLowerCase();
-
-    const rankedPlaces = places
-      .filter((place) => {
-        if (normalizedQuestion.includes("tacc")) {
-          return place.badges.includes("gluten_free");
-        }
-
-        if (normalizedQuestion.includes("perro") || normalizedQuestion.includes("mascota")) {
-          return place.badges.includes("pet_friendly");
-        }
-
-        if (
-          normalizedQuestion.includes("vegetariano") ||
-          normalizedQuestion.includes("vegano")
-        ) {
-          return (
-            place.badges.includes("vegetarian") ||
-            place.badges.includes("vegan")
-          );
-        }
-
-        if (normalizedQuestion.includes("café") || normalizedQuestion.includes("cafe")) {
-          return place.category === "Cafetería";
-        }
-
-        return true;
-      })
-      .slice(0, 2);
+    const location = await getAssistantLocation();
+    const payload = await apiFetch<AssistantMessageResponse>("/assistant/message", {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify({
+        message: question,
+        ...(location ? { location } : {})
+      } satisfies AssistantMessageRequest)
+    });
+    const places = await Promise.all(
+      payload.recommendations.map((placeId) => placeService.getPlaceById(placeId))
+    );
+    const recommendations = places.flatMap((place) =>
+      place
+        ? [
+            {
+              place,
+              reason: "Coincide con los criterios de tu búsqueda."
+            }
+          ]
+        : []
+    );
 
     return {
       id: createMockId("assistant"),
       role: "assistant",
-      content:
-        rankedPlaces.length > 0
-          ? "Encontré estos lugares que podrían interesarte:"
-          : "No encontré una coincidencia exacta, pero podés probar con otra búsqueda o revisar el mapa.",
+      content: payload.message,
       createdAt: new Date().toISOString(),
-      recommendations: rankedPlaces.map((place) => ({
-        place,
-        reason:
-          place.id === "cafe-de-la-plaza"
-            ? "Ambiente tranquilo, buen café y opciones para ir con mascota."
-            : place.id === "verde-natural"
-              ? "Tiene opciones vegetarianas, veganas y sin TACC con muy buenas reseñas."
-              : "Coincide con tu búsqueda y mantiene buenas valoraciones de la comunidad."
-      }))
+      ...(recommendations.length ? { recommendations } : {})
     };
   }
 };
+
+async function getAssistantLocation() {
+  if (typeof navigator === "undefined" || !navigator.geolocation) {
+    return undefined;
+  }
+
+  if (!navigator.permissions) {
+    return undefined;
+  }
+
+  try {
+    const permission = await navigator.permissions.query({ name: "geolocation" });
+
+    if (permission.state !== "granted") {
+      return undefined;
+    }
+
+    return await new Promise<{ lat: number; lng: number } | undefined>((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) =>
+          resolve({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          }),
+        () => resolve(undefined),
+        {
+          enableHighAccuracy: false,
+          maximumAge: 5 * 60 * 1000,
+          timeout: 1500
+        }
+      );
+    });
+  } catch {
+    return undefined;
+  }
+}

@@ -122,14 +122,15 @@ export interface MetadataResponse {
   accessibilityFeatures: FeatureDefinition[];
 }
 
-export interface AssistantRecommendationRequest {
-  question: string;
+export interface AssistantMessageRequest {
+  message: string;
+  location?: {
+    lat: number;
+    lng: number;
+  };
 }
 
-export interface AssistantRecommendationResponse {
+export interface AssistantMessageResponse {
   message: string;
-  recommendations: Array<{
-    place: Place;
-    reason: string;
-  }>;
+  recommendations: string[];
 }

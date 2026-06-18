@@ -38,9 +38,23 @@ export function AIAssistantScreen() {
     setInput("");
     setIsSubmitting(true);
 
-    const response = await assistantService.askIAn(question);
-    setMessages((current) => [...current, response]);
-    setIsSubmitting(false);
+    try {
+      const response = await assistantService.askIAn(question);
+      setMessages((current) => [...current, response]);
+    } catch {
+      setMessages((current) => [
+        ...current,
+        {
+          id: createMockId("assistant"),
+          role: "assistant",
+          content:
+            "No pude preparar una respuesta ahora. Probá de nuevo en unos minutos.",
+          createdAt: new Date().toISOString()
+        }
+      ]);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -56,7 +70,7 @@ export function AIAssistantScreen() {
           IAn
         </p>
         <h1>Asistente de recomendaciones</h1>
-        <p>Hacé una pregunta simple y recibí sugerencias con lugares mockeados.</p>
+        <p>Hacé una pregunta simple y recibí sugerencias de lugares.</p>
       </header>
 
       <section
