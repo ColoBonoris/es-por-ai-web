@@ -73,8 +73,13 @@ export function LoginScreen() {
             </Link>
           </div>
 
-          <Button type="submit" fullWidth disabled={isSubmitting}>
-            {isSubmitting ? "Ingresando..." : "Iniciar sesión"}
+          <Button
+            type="submit"
+            fullWidth
+            isLoading={isSubmitting}
+            loadingLabel="Ingresando"
+          >
+            Iniciar sesión
           </Button>
           <p className="field-helper">
             Cleinte demo: <strong>demo@esporai.dev</strong> / <strong>Acceso123!</strong>

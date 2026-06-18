@@ -842,6 +842,13 @@
   background: var(--secondary);
 }
 
+.chat-bubble--loading {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--muted);
+}
+
 .chat-message--user .chat-bubble {
   background: var(--accent);
   color: #ffffff;

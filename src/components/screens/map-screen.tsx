@@ -8,6 +8,7 @@ import { SearchBar } from "@/components/forms/search-bar";
 import { PlaceCard } from "@/components/places/place-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { FilterChip } from "@/components/ui/filter-chip";
+import { LoadingState } from "@/components/ui/loading-state";
 import { metadataService } from "@/services/metadata-service";
 import { placeService } from "@/services/place-service";
 import type { AccessibilityFeature, FeatureDefinition, Place } from "@/types/domain";
@@ -16,7 +17,11 @@ const LeafletMap = dynamic(
   () => import("@/components/places/leaflet-map").then((mod) => mod.LeafletMap),
   {
     ssr: false,
-    loading: () => <div className="leaflet-map leaflet-map--loading">Cargando mapa...</div>
+    loading: () => (
+      <div className="leaflet-map leaflet-map--loading">
+        <LoadingState label="Cargando mapa" size="compact" />
+      </div>
+    )
   }
 );
 
@@ -28,6 +33,7 @@ export function MapScreen() {
   const [selectedFeatures, setSelectedFeatures] = useState<AccessibilityFeature[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [features, setFeatures] = useState<FeatureDefinition[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     void Promise.all([
@@ -38,7 +44,7 @@ export function MapScreen() {
       setPlaces(nextPlaces);
       setCategories(nextCategories);
       setFeatures(nextFeatures);
-    });
+    }).finally(() => setIsLoading(false));
   }, []);
 
   function toggleCategory(category: string) {
@@ -141,7 +147,12 @@ export function MapScreen() {
             </div>
           </div>
           <div className="place-list">
-            {filteredPlaces.length > 0 ? (
+            {isLoading ? (
+              <LoadingState
+                label="Cargando lugares"
+                description="Estamos trayendo los resultados para el mapa."
+              />
+            ) : filteredPlaces.length > 0 ? (
               filteredPlaces.map((place) => (
                 <PlaceCard key={place.id} place={place} compact />
               ))

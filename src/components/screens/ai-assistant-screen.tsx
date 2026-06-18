@@ -107,6 +107,15 @@ export function AIAssistantScreen() {
             ))}
           </div>
         ) : null}
+
+        {isSubmitting ? (
+          <article className="chat-message" role="status" aria-live="polite">
+            <div className="chat-bubble chat-bubble--loading">
+              <span className="spinner spinner--button" aria-hidden="true" />
+              <p>IAn está preparando una respuesta.</p>
+            </div>
+          </article>
+        ) : null}
       </section>
 
       <form className="chat-form" onSubmit={handleSubmit}>
@@ -122,7 +131,9 @@ export function AIAssistantScreen() {
         />
         <Button
           type="submit"
-          disabled={!input.trim() || isSubmitting}
+          disabled={!input.trim()}
+          isLoading={isSubmitting}
+          loadingLabel="Enviando"
           icon={<Send aria-hidden="true" size={18} />}
         >
           Enviar

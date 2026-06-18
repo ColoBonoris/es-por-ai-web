@@ -50,8 +50,13 @@ export function ForgotPasswordScreen() {
             onChange={(event) => setEmail(event.target.value)}
             required
           />
-          <Button type="submit" fullWidth disabled={isSubmitting}>
-            {isSubmitting ? "Enviando..." : "Enviar instrucciones"}
+          <Button
+            type="submit"
+            fullWidth
+            isLoading={isSubmitting}
+            loadingLabel="Enviando"
+          >
+            Enviar instrucciones
           </Button>
           <p className="status-message" role="status" aria-live="polite">
             {message}

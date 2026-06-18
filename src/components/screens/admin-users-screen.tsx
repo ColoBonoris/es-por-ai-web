@@ -11,6 +11,7 @@ import {
 import { FormEvent, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { LoadingState } from "@/components/ui/loading-state";
 import { adminService } from "@/services/admin-service";
 import type {
   AdminPlaceSubmissionListItem,
@@ -289,7 +290,12 @@ export function AdminUsersScreen() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
-          <Button type="submit" variant="ghost">
+          <Button
+            type="submit"
+            variant="ghost"
+            isLoading={isLoading}
+            loadingLabel="Buscando"
+          >
             Buscar
           </Button>
         </form>
@@ -335,7 +341,9 @@ export function AdminUsersScreen() {
           </div>
         ) : null}
 
-        {isLoading ? <p className="status-message">Cargando usuarios...</p> : null}
+        {isLoading ? (
+          <LoadingState label="Cargando usuarios" size="compact" />
+        ) : null}
         {error ? (
           <p className="field-error" role="alert">
             {error}
@@ -388,7 +396,12 @@ export function AdminUsersScreen() {
               value={submissionsQuery}
               onChange={(event) => setSubmissionsQuery(event.target.value)}
             />
-            <Button type="submit" variant="ghost">
+            <Button
+              type="submit"
+              variant="ghost"
+              isLoading={areSubmissionsLoading}
+              loadingLabel="Buscando"
+            >
               Buscar
             </Button>
           </form>
@@ -443,7 +456,7 @@ export function AdminUsersScreen() {
           ) : null}
 
           {areSubmissionsLoading ? (
-            <p className="status-message">Cargando lugares pendientes...</p>
+            <LoadingState label="Cargando lugares pendientes" size="compact" />
           ) : null}
           {submissionsError ? (
             <p className="field-error" role="alert">
@@ -675,14 +688,13 @@ function ReviewPlaceSubmissionModal({
               <Button
                 type="button"
                 variant={mode === "approve" ? "primary" : "danger"}
-                disabled={isSubmitting}
+                isLoading={isSubmitting}
+                loadingLabel="Guardando"
                 onClick={mode === "approve" ? onApprove : onReject}
               >
-                {isSubmitting
-                  ? "Guardando..."
-                  : mode === "approve"
-                    ? "Confirmar aprobación"
-                    : "Confirmar rechazo"}
+                {mode === "approve"
+                  ? "Confirmar aprobación"
+                  : "Confirmar rechazo"}
               </Button>
             </>
           )}

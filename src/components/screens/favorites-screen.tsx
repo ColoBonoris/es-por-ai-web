@@ -5,14 +5,19 @@ import { useEffect, useState } from "react";
 
 import { PlaceCard } from "@/components/places/place-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { LoadingState } from "@/components/ui/loading-state";
 import { placeService } from "@/services/place-service";
 import type { Place } from "@/types/domain";
 
 export function FavoritesScreen() {
   const [places, setPlaces] = useState<Place[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    void placeService.getFavoritePlaces().then(setPlaces);
+    void placeService
+      .getFavoritePlaces()
+      .then(setPlaces)
+      .finally(() => setIsLoading(false));
   }, []);
 
   return (
@@ -24,7 +29,12 @@ export function FavoritesScreen() {
       </header>
 
       <section className="place-list" aria-label="Lugares favoritos">
-        {places.length > 0 ? (
+        {isLoading ? (
+          <LoadingState
+            label="Cargando favoritos"
+            description="Estamos recuperando los lugares guardados."
+          />
+        ) : places.length > 0 ? (
           places.map((place) => <PlaceCard key={place.id} place={place} />)
         ) : (
           <EmptyState

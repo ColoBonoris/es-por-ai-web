@@ -9,6 +9,7 @@ import { TextareaField } from "@/components/forms/textarea-field";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FilterChip } from "@/components/ui/filter-chip";
+import { LoadingState } from "@/components/ui/loading-state";
 import { metadataService } from "@/services/metadata-service";
 import { placeService } from "@/services/place-service";
 import type { AccessibilityFeature, FeatureDefinition } from "@/types/domain";
@@ -21,7 +22,9 @@ const LocationPicker = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="leaflet-map leaflet-map--loading">Cargando mapa...</div>
+      <div className="leaflet-map leaflet-map--loading">
+        <LoadingState label="Cargando mapa" size="compact" />
+      </div>
     )
   }
 );
@@ -41,6 +44,7 @@ export function AddPlaceScreen() {
   const [images, setImages] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [isMetadataLoading, setIsMetadataLoading] = useState(true);
   const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -51,7 +55,7 @@ export function AddPlaceScreen() {
     ]).then(([nextCategories, nextFeatures]) => {
       setCategories(nextCategories);
       setFeatures(nextFeatures);
-    });
+    }).finally(() => setIsMetadataLoading(false));
   }, []);
 
   function toggleFeature(feature: AccessibilityFeature) {
@@ -155,27 +159,31 @@ export function AddPlaceScreen() {
             aria-invalid={categoryError ? true : undefined}
           >
             <legend>Categoría</legend>
-            <div className="chip-row">
-              {categories.map((item) => (
-                <label
-                  key={item}
-                  className={`filter-chip choice-chip ${
-                    category === item ? "filter-chip--selected" : ""
-                  }`}
-                >
-                  <input
-                    className="choice-chip__input sr-only"
-                    type="radio"
-                    name="place-category"
-                    value={item}
-                    checked={category === item}
-                    onChange={() => setCategory(item)}
-                    required
-                  />
-                  <span>{item}</span>
-                </label>
-              ))}
-            </div>
+            {isMetadataLoading ? (
+              <LoadingState label="Cargando categorías" size="compact" />
+            ) : (
+              <div className="chip-row">
+                {categories.map((item) => (
+                  <label
+                    key={item}
+                    className={`filter-chip choice-chip ${
+                      category === item ? "filter-chip--selected" : ""
+                    }`}
+                  >
+                    <input
+                      className="choice-chip__input sr-only"
+                      type="radio"
+                      name="place-category"
+                      value={item}
+                      checked={category === item}
+                      onChange={() => setCategory(item)}
+                      required
+                    />
+                    <span>{item}</span>
+                  </label>
+                ))}
+              </div>
+            )}
             {categoryError ? (
               <p id="place-category-error" className="field-error" role="alert">
                 {categoryError}
@@ -206,16 +214,20 @@ export function AddPlaceScreen() {
 
         <section className="form-section" aria-labelledby="place-accessibility-title">
           <h2 id="place-accessibility-title">Características</h2>
-          <div className="chip-row">
-            {features.map((feature) => (
-              <FilterChip
-                key={feature.id}
-                label={feature.label}
-                selected={selectedFeatures.includes(feature.id)}
-                onToggle={() => toggleFeature(feature.id)}
-              />
-            ))}
-          </div>
+          {isMetadataLoading ? (
+            <LoadingState label="Cargando características" size="compact" />
+          ) : (
+            <div className="chip-row">
+              {features.map((feature) => (
+                <FilterChip
+                  key={feature.id}
+                  label={feature.label}
+                  selected={selectedFeatures.includes(feature.id)}
+                  onToggle={() => toggleFeature(feature.id)}
+                />
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="form-section" aria-labelledby="place-photos-title">
@@ -223,8 +235,13 @@ export function AddPlaceScreen() {
           <PhotoUploadField label="Fotos del lugar" images={images} onChange={setImages} />
         </section>
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Enviando..." : "Enviar para aprobación"}
+        <Button
+          type="submit"
+          disabled={isMetadataLoading}
+          isLoading={isSubmitting}
+          loadingLabel="Enviando"
+        >
+          Enviar para aprobación
         </Button>
         <p className="status-message" role="status" aria-live="polite">
           {message}

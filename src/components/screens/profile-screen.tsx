@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { PlaceCard } from "@/components/places/place-card";
 import { ReviewCard } from "@/components/places/review-card";
 import { Badge } from "@/components/ui/badge";
+import { LoadingState } from "@/components/ui/loading-state";
 import { getFeatureLabel } from "@/services/metadata-service";
 import { placeService } from "@/services/place-service";
 import { reviewService } from "@/services/review-service";
@@ -15,24 +16,46 @@ export function ProfileScreen() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [favorites, setFavorites] = useState<Place[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadProfile() {
-      const [nextProfile, nextReviews, nextFavorites] = await Promise.all([
-        userService.getProfile(),
-        reviewService.getRecentReviews(),
-        placeService.getFavoritePlaces()
-      ]);
-      setProfile(nextProfile);
-      setReviews(nextReviews);
-      setFavorites(nextFavorites);
+      try {
+        const [nextProfile, nextReviews, nextFavorites] = await Promise.all([
+          userService.getProfile(),
+          reviewService.getRecentReviews(),
+          placeService.getFavoritePlaces()
+        ]);
+        setProfile(nextProfile);
+        setReviews(nextReviews);
+        setFavorites(nextFavorites);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     void loadProfile();
   }, []);
 
+  if (isLoading) {
+    return (
+      <div className="page-stack">
+        <LoadingState
+          label="Cargando perfil"
+          description="Estamos preparando tu actividad y preferencias."
+        />
+      </div>
+    );
+  }
+
   if (!profile) {
-    return <p>Cargando perfil...</p>;
+    return (
+      <div className="page-stack">
+        <p className="field-error" role="alert">
+          No se pudo cargar el perfil.
+        </p>
+      </div>
+    );
   }
 
   return (

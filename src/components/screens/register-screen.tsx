@@ -7,6 +7,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { TextField } from "@/components/forms/text-field";
 import { Button } from "@/components/ui/button";
 import { FilterChip } from "@/components/ui/filter-chip";
+import { LoadingState } from "@/components/ui/loading-state";
 import { metadataService } from "@/services/metadata-service";
 import { useAuth } from "@/providers/auth-provider";
 import type { AccessibilityFeature, FeatureDefinition } from "@/types/domain";
@@ -20,10 +21,14 @@ export function RegisterScreen() {
   const [password, setPassword] = useState("");
   const [preferences, setPreferences] = useState<AccessibilityFeature[]>([]);
   const [error, setError] = useState("");
+  const [areFeaturesLoading, setAreFeaturesLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    void metadataService.getAccessibilityFeatures().then(setFeatures);
+    void metadataService
+      .getAccessibilityFeatures()
+      .then(setFeatures)
+      .finally(() => setAreFeaturesLoading(false));
   }, []);
 
   function togglePreference(feature: AccessibilityFeature) {
@@ -98,20 +103,29 @@ export function RegisterScreen() {
             <p className="field-helper">
               Opcional. Nos ayuda a ordenar recomendaciones útiles.
             </p>
-            <div className="chip-row">
-              {features.map((feature) => (
-                <FilterChip
-                  key={feature.id}
-                  label={feature.label}
-                  selected={preferences.includes(feature.id)}
-                  onToggle={() => togglePreference(feature.id)}
-                />
-              ))}
-            </div>
+            {areFeaturesLoading ? (
+              <LoadingState label="Cargando preferencias" size="compact" />
+            ) : (
+              <div className="chip-row">
+                {features.map((feature) => (
+                  <FilterChip
+                    key={feature.id}
+                    label={feature.label}
+                    selected={preferences.includes(feature.id)}
+                    onToggle={() => togglePreference(feature.id)}
+                  />
+                ))}
+              </div>
+            )}
           </fieldset>
 
-          <Button type="submit" fullWidth disabled={isSubmitting}>
-            {isSubmitting ? "Creando cuenta..." : "Crear cuenta"}
+          <Button
+            type="submit"
+            fullWidth
+            isLoading={isSubmitting}
+            loadingLabel="Creando cuenta"
+          >
+            Crear cuenta
           </Button>
           <p className="field-error" role="alert">
             {error}

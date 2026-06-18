@@ -10,6 +10,7 @@ import { ReviewCard } from "@/components/places/review-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { LoadingState } from "@/components/ui/loading-state";
 import { StarRating } from "@/components/ui/star-rating";
 import { getFeatureLabel } from "@/services/metadata-service";
 import { placeService } from "@/services/place-service";
@@ -22,7 +23,7 @@ const LeafletMap = dynamic(
     ssr: false,
     loading: () => (
       <div className="leaflet-map leaflet-map--compact leaflet-map--loading">
-        Cargando mapa...
+        <LoadingState label="Cargando mapa" size="compact" />
       </div>
     )
   }
@@ -32,6 +33,7 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
   const [place, setPlace] = useState<Place | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFavoriteUpdating, setIsFavoriteUpdating] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
 
   useEffect(() => {
@@ -53,14 +55,20 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
       return;
     }
 
-    const isFavorite = await placeService.toggleFavorite(
-      place.id,
-      !place.isFavorite
-    );
-    setPlace({
-      ...place,
-      isFavorite
-    });
+    setIsFavoriteUpdating(true);
+
+    try {
+      const isFavorite = await placeService.toggleFavorite(
+        place.id,
+        !place.isFavorite
+      );
+      setPlace({
+        ...place,
+        isFavorite
+      });
+    } finally {
+      setIsFavoriteUpdating(false);
+    }
   }
 
   async function sharePlace() {
@@ -101,7 +109,10 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
   if (!place) {
     return (
       <div className="page-stack">
-        <p>Cargando lugar...</p>
+        <LoadingState
+          label="Cargando lugar"
+          description="Estamos buscando el detalle y sus reseñas."
+        />
       </div>
     );
   }
@@ -200,6 +211,8 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
               icon={<Heart aria-hidden="true" size={18} />}
               aria-pressed={place.isFavorite}
               onClick={toggleFavorite}
+              isLoading={isFavoriteUpdating}
+              loadingLabel="Guardando"
             >
               {place.isFavorite ? "Guardado" : "Guardar"}
             </Button>

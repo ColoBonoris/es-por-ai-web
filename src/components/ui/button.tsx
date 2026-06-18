@@ -8,6 +8,8 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   fullWidth?: boolean;
   icon?: ReactNode;
+  isLoading?: boolean;
+  loadingLabel?: string;
 }
 
 export function Button({
@@ -15,7 +17,10 @@ export function Button({
   variant = "primary",
   fullWidth,
   icon,
+  isLoading = false,
+  loadingLabel = "Cargando",
   children,
+  disabled,
   ...props
 }: ButtonProps) {
   return (
@@ -24,12 +29,19 @@ export function Button({
         "button",
         `button--${variant}`,
         fullWidth && "button--full",
+        isLoading && "button--loading",
         className
       )}
+      disabled={disabled || isLoading}
+      aria-busy={isLoading}
       {...props}
     >
-      {icon}
-      <span>{children}</span>
+      {isLoading ? (
+        <span className="spinner spinner--button" aria-hidden="true" />
+      ) : (
+        icon
+      )}
+      <span>{isLoading ? loadingLabel : children}</span>
     </button>
   );
 }

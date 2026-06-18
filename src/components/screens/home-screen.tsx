@@ -9,6 +9,7 @@ import { PlaceCard } from "@/components/places/place-card";
 import { ReviewCard } from "@/components/places/review-card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { LoadingState } from "@/components/ui/loading-state";
 import { placeService } from "@/services/place-service";
 import { reviewService } from "@/services/review-service";
 import { userService } from "@/services/user-service";
@@ -19,17 +20,22 @@ export function HomeScreen() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [query, setQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadHome() {
-      const [nextPlaces, nextReviews, nextProfile] = await Promise.all([
-        placeService.getPlaces(),
-        reviewService.getRecentReviews(),
-        userService.getProfile()
-      ]);
-      setPlaces(nextPlaces);
-      setReviews(nextReviews);
-      setProfile(nextProfile);
+      try {
+        const [nextPlaces, nextReviews, nextProfile] = await Promise.all([
+          placeService.getPlaces(),
+          reviewService.getRecentReviews(),
+          userService.getProfile()
+        ]);
+        setPlaces(nextPlaces);
+        setReviews(nextReviews);
+        setProfile(nextProfile);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     void loadHome();
@@ -92,7 +98,12 @@ export function HomeScreen() {
               </Link>
             </div>
 
-            {filteredPlaces.length > 0 ? (
+            {isLoading ? (
+              <LoadingState
+                label="Cargando recomendaciones"
+                description="Estamos preparando lugares y reseñas recientes."
+              />
+            ) : filteredPlaces.length > 0 ? (
               filteredPlaces.slice(0, 4).map((place) => (
                 <PlaceCard key={place.id} place={place} />
               ))
@@ -118,13 +129,17 @@ export function HomeScreen() {
                 <p>Actividad de la comunidad.</p>
               </div>
             </div>
-            {reviews.map((review) => (
-              <ReviewCard
-                key={review.id}
-                review={review}
-                placeName={places.find((place) => place.id === review.placeId)?.name}
-              />
-            ))}
+            {isLoading ? (
+              <LoadingState label="Cargando reseñas" size="compact" />
+            ) : (
+              reviews.map((review) => (
+                <ReviewCard
+                  key={review.id}
+                  review={review}
+                  placeName={places.find((place) => place.id === review.placeId)?.name}
+                />
+              ))
+            )}
           </section>
         </aside>
       </div>

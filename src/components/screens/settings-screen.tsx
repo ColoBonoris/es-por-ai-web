@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { FilterChip } from "@/components/ui/filter-chip";
+import { LoadingState } from "@/components/ui/loading-state";
 import {
   getFeatureLabel,
   metadataService
@@ -76,15 +77,20 @@ export function SettingsScreen() {
   const [message, setMessage] = useState("");
   const [toastMessage, setToastMessage] = useState("");
   const [features, setFeatures] = useState<FeatureDefinition[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadSettings() {
-      const [nextProfile, nextFeatures] = await Promise.all([
-        userService.getProfile(),
-        metadataService.getAccessibilityFeatures()
-      ]);
-      setProfile(nextProfile);
-      setFeatures(nextFeatures);
+      try {
+        const [nextProfile, nextFeatures] = await Promise.all([
+          userService.getProfile(),
+          metadataService.getAccessibilityFeatures()
+        ]);
+        setProfile(nextProfile);
+        setFeatures(nextFeatures);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     void loadSettings();
@@ -151,8 +157,25 @@ export function SettingsScreen() {
     setMessage("Preferencias guardadas.");
   }
 
+  if (isLoading) {
+    return (
+      <div className="page-stack settings-page">
+        <LoadingState
+          label="Cargando configuración"
+          description="Estamos recuperando preferencias, tema y permisos."
+        />
+      </div>
+    );
+  }
+
   if (!profile) {
-    return <p>Cargando configuración...</p>;
+    return (
+      <div className="page-stack settings-page">
+        <p className="field-error" role="alert">
+          No se pudo cargar la configuración.
+        </p>
+      </div>
+    );
   }
 
   return (

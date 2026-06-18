@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { PermissionCard } from "@/components/app/permission-card";
 import { Button } from "@/components/ui/button";
+import { LoadingState } from "@/components/ui/loading-state";
 import { userService } from "@/services/user-service";
 import type { PermissionPreference } from "@/types/domain";
 
@@ -17,11 +18,16 @@ export function PermissionsScreen() {
     notifications: false
   });
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function loadPermissions() {
-      const profile = await userService.getProfile();
-      setPermissions(profile.settings.permissions);
+      try {
+        const profile = await userService.getProfile();
+        setPermissions(profile.settings.permissions);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     void loadPermissions();
@@ -48,35 +54,53 @@ export function PermissionsScreen() {
         <p>Son mockeados por ahora, pero la decisión queda persistida localmente.</p>
       </header>
 
-      <section className="form-section" aria-label="Permisos disponibles">
-        <PermissionCard
-          title="Ubicación"
-          description="Para sugerir lugares cerca tuyo."
-          enabled={permissions.location}
-          icon={<MapPin aria-hidden="true" />}
-          onToggle={() => togglePermission("location")}
+      {isLoading ? (
+        <LoadingState
+          label="Cargando permisos"
+          description="Estamos recuperando tus preferencias guardadas."
         />
-        <PermissionCard
-          title="Cámara y fotos"
-          description="Para sumar fotos en reseñas y lugares."
-          enabled={permissions.camera}
-          icon={<Camera aria-hidden="true" />}
-          onToggle={() => togglePermission("camera")}
-        />
-        <PermissionCard
-          title="Notificaciones"
-          description="Para novedades sobre reseñas y recomendaciones."
-          enabled={permissions.notifications}
-          icon={<Bell aria-hidden="true" />}
-          onToggle={() => togglePermission("notifications")}
-        />
-      </section>
+      ) : (
+        <section className="form-section" aria-label="Permisos disponibles">
+          <PermissionCard
+            title="Ubicación"
+            description="Para sugerir lugares cerca tuyo."
+            enabled={permissions.location}
+            icon={<MapPin aria-hidden="true" />}
+            onToggle={() => togglePermission("location")}
+          />
+          <PermissionCard
+            title="Cámara y fotos"
+            description="Para sumar fotos en reseñas y lugares."
+            enabled={permissions.camera}
+            icon={<Camera aria-hidden="true" />}
+            onToggle={() => togglePermission("camera")}
+          />
+          <PermissionCard
+            title="Notificaciones"
+            description="Para novedades sobre reseñas y recomendaciones."
+            enabled={permissions.notifications}
+            icon={<Bell aria-hidden="true" />}
+            onToggle={() => togglePermission("notifications")}
+          />
+        </section>
+      )}
 
       <div className="button-row">
-        <Button type="button" onClick={savePermissions} disabled={isSaving}>
-          {isSaving ? "Guardando..." : "Guardar y continuar"}
+        <Button
+          type="button"
+          onClick={savePermissions}
+          disabled={isLoading}
+          isLoading={isSaving}
+          loadingLabel="Guardando"
+        >
+          Guardar y continuar
         </Button>
-        <Button type="button" variant="ghost" onClick={() => router.push("/home")}>
+        <Button
+          type="button"
+          variant="ghost"
+          disabled={isLoading || isSaving}
+          onClick={() => router.push("/home")}
+        >
           Omitir por ahora
         </Button>
       </div>
