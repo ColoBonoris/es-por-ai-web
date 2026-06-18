@@ -1,4 +1,4 @@
-import { mockUsers, toAuthUser } from "@/mocks/users";
+import { apiFetch, jsonHeaders } from "@/services/api-client";
 import type { AuthUser } from "@/types/auth";
 import type { UserPreferences } from "@/types/domain";
 
@@ -6,44 +6,16 @@ interface AuthResponse {
   user: AuthUser | null;
 }
 
-interface AuthErrorResponse {
-  message?: string;
-}
-
-export async function validateMockCredentials(
-  email: string,
-  password: string
-): Promise<AuthUser | null> {
-  const normalizedEmail = email.trim().toLowerCase();
-  const user = mockUsers.find(
-    (record) =>
-      record.email.toLowerCase() === normalizedEmail &&
-      record.password === password
-  );
-
-  return user ? toAuthUser(user) : null;
-}
-
-async function parseAuthResponse(response: Response): Promise<AuthResponse> {
-  if (!response.ok) {
-    const payload = (await response.json()) as AuthErrorResponse;
-    throw new Error(payload.message ?? "No se pudo completar la acción.");
-  }
-
-  return (await response.json()) as AuthResponse;
-}
-
 export const authService = {
   async login(email: string, password: string): Promise<AuthUser> {
-    const payload = await parseAuthResponse(
-      await fetch("/api/auth/login", {
+    const payload = await apiFetch<AuthResponse>(
+      "/auth/login",
+      {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: jsonHeaders(),
         body: JSON.stringify({ email, password })
-      })
+      },
+      { skipRefresh: true }
     );
 
     if (!payload.user) {
@@ -59,15 +31,14 @@ export const authService = {
     password: string;
     preferences: UserPreferences;
   }): Promise<AuthUser> {
-    const payload = await parseAuthResponse(
-      await fetch("/api/auth/register", {
+    const payload = await apiFetch<AuthResponse>(
+      "/auth/register",
+      {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: jsonHeaders(),
         body: JSON.stringify(input)
-      })
+      },
+      { skipRefresh: true }
     );
 
     if (!payload.user) {
@@ -78,37 +49,36 @@ export const authService = {
   },
 
   async forgotPassword(email: string): Promise<void> {
-    await parseAuthResponse(
-      await fetch("/api/auth/forgot-password", {
+    await apiFetch<AuthResponse>(
+      "/auth/forgot-password",
+      {
         method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: jsonHeaders(),
         body: JSON.stringify({ email })
-      })
+      },
+      { skipRefresh: true }
     );
   },
 
   async logout(): Promise<void> {
-    await fetch("/api/auth/logout", {
-      method: "POST",
-      credentials: "include"
-    });
+    await apiFetch<{ ok: boolean }>(
+      "/auth/logout",
+      {
+        method: "POST"
+      },
+      { skipRefresh: true }
+    ).catch(() => undefined);
   },
 
   async getSession(): Promise<AuthUser | null> {
-    const response = await fetch("/api/auth/session", {
-      method: "GET",
-      credentials: "include",
-      cache: "no-store"
-    });
-
-    if (!response.ok) {
+    try {
+      const payload = await apiFetch<AuthResponse>("/auth/me", {
+        method: "GET",
+        cache: "no-store"
+      });
+      return payload.user;
+    } catch {
       return null;
     }
-
-    const payload = (await response.json()) as AuthResponse;
-    return payload.user;
   }
 };

@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import dynamic from "next/dynamic";
+import { FormEvent, useEffect, useState } from "react";
 
 import { PhotoUploadField } from "@/components/forms/photo-upload-field";
 import { TextField } from "@/components/forms/text-field";
@@ -8,22 +9,50 @@ import { TextareaField } from "@/components/forms/textarea-field";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FilterChip } from "@/components/ui/filter-chip";
+import { metadataService } from "@/services/metadata-service";
 import { placeService } from "@/services/place-service";
-import type { AccessibilityFeature } from "@/types/domain";
+import type { AccessibilityFeature, FeatureDefinition } from "@/types/domain";
+
+const LocationPicker = dynamic(
+  () =>
+    import("@/components/places/location-picker").then(
+      (mod) => mod.LocationPicker
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="leaflet-map leaflet-map--loading">Cargando mapa...</div>
+    )
+  }
+);
 
 export function AddPlaceScreen() {
-  const categories = placeService.getCategories();
-  const features = placeService.getAccessibilityFeatures();
+  const [categories, setCategories] = useState<string[]>([]);
+  const [features, setFeatures] = useState<FeatureDefinition[]>([]);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [category, setCategory] = useState("");
   const [description, setDescription] = useState("");
+  const [coordinates, setCoordinates] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
   const [selectedFeatures, setSelectedFeatures] = useState<AccessibilityFeature[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    void Promise.all([
+      metadataService.getCategories(),
+      metadataService.getAccessibilityFeatures()
+    ]).then(([nextCategories, nextFeatures]) => {
+      setCategories(nextCategories);
+      setFeatures(nextFeatures);
+    });
+  }, []);
 
   function toggleFeature(feature: AccessibilityFeature) {
     setSelectedFeatures((current) =>
@@ -39,8 +68,10 @@ export function AddPlaceScreen() {
     setError("");
     setHasTriedSubmit(true);
 
-    if (!name.trim() || !address.trim() || !category) {
-      setError("Completá nombre, dirección y categoría para enviar el lugar.");
+    if (!name.trim() || !address.trim() || !category || !coordinates) {
+      setError(
+        "Completá nombre, dirección, categoría y ubicación para enviar el lugar."
+      );
       return;
     }
 
@@ -52,6 +83,7 @@ export function AddPlaceScreen() {
         address,
         category,
         description,
+        coordinates,
         badges: selectedFeatures,
         images
       });
@@ -60,6 +92,7 @@ export function AddPlaceScreen() {
       setAddress("");
       setCategory("");
       setDescription("");
+      setCoordinates(null);
       setSelectedFeatures([]);
       setImages([]);
       setHasTriedSubmit(false);
@@ -78,6 +111,9 @@ export function AddPlaceScreen() {
     : undefined;
   const categoryError = hasTriedSubmit && !category
     ? "Elegí una categoría."
+    : undefined;
+  const locationError = hasTriedSubmit && !coordinates
+    ? "Elegí la ubicación en el mapa."
     : undefined;
 
   return (
@@ -156,6 +192,16 @@ export function AddPlaceScreen() {
             value={description}
             onChange={(event) => setDescription(event.target.value)}
           />
+        </section>
+
+        <section className="form-section" aria-labelledby="place-location-title">
+          <h2 id="place-location-title">Ubicación</h2>
+          <LocationPicker value={coordinates} onChange={setCoordinates} />
+          {locationError ? (
+            <p className="field-error" role="alert">
+              {locationError}
+            </p>
+          ) : null}
         </section>
 
         <section className="form-section" aria-labelledby="place-accessibility-title">

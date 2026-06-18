@@ -10,7 +10,7 @@ export const mockUsers: MockUserRecord[] = [
     name: "María González",
     email: "demo@esporai.dev",
     password: "Acceso123!",
-    role: "editor",
+    role: "CLIENT",
     preferences: {
       accessibilityFeatures: ["gluten_free", "pet_friendly"]
     }

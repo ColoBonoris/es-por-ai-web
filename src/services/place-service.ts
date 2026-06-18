@@ -1,98 +1,53 @@
-import {
-  accessibilityFeatures,
-  placeCategories,
-  seedPlaces
-} from "@/mocks/app-data";
 import type {
   Place,
   PlaceSubmission,
   SavedPlaceSubmission
 } from "@/types/domain";
-import {
-  createMockId,
-  readStorage,
-  STORAGE_KEYS,
-  waitForMock,
-  writeStorage
-} from "@/services/mock-storage";
-
-function getFavoriteIds() {
-  return readStorage<string[]>(STORAGE_KEYS.favorites, []);
-}
-
-function withFavoriteState(place: Place): Place {
-  return {
-    ...place,
-    isFavorite: getFavoriteIds().includes(place.id)
-  };
-}
+import { apiFetch, jsonHeaders } from "@/services/api-client";
+import type { FavoriteStatusResponse, PaginatedResponse, PlaceResponse } from "@/types/api";
 
 export const placeService = {
   async getPlaces(): Promise<Place[]> {
-    await waitForMock();
-    return seedPlaces.map(withFavoriteState);
+    const payload = await apiFetch<PaginatedResponse<Place>>("/places");
+    return payload.data;
   },
 
   async getPlaceById(placeId: string): Promise<Place | null> {
-    await waitForMock();
-    const place = seedPlaces.find((item) => item.id === placeId);
-    return place ? withFavoriteState(place) : null;
+    try {
+      const payload = await apiFetch<PlaceResponse>(`/places/${placeId}`);
+      return payload.place;
+    } catch {
+      return null;
+    }
   },
 
   async getFavoritePlaces(): Promise<Place[]> {
-    await waitForMock();
-    const favoriteIds = getFavoriteIds();
-    return seedPlaces
-      .filter((place) => favoriteIds.includes(place.id))
-      .map(withFavoriteState);
+    const payload = await apiFetch<PaginatedResponse<Place>>("/favorites");
+    return payload.data;
   },
 
-  async toggleFavorite(placeId: string): Promise<boolean> {
-    await waitForMock();
-    const favoriteIds = getFavoriteIds();
-    const nextFavoriteIds = favoriteIds.includes(placeId)
-      ? favoriteIds.filter((id) => id !== placeId)
-      : [...favoriteIds, placeId];
-
-    writeStorage(STORAGE_KEYS.favorites, nextFavoriteIds);
-    return nextFavoriteIds.includes(placeId);
+  async toggleFavorite(placeId: string, nextState = true): Promise<boolean> {
+    const payload = await apiFetch<FavoriteStatusResponse>(
+      `/favorites/${placeId}`,
+      {
+        method: nextState ? "POST" : "DELETE"
+      }
+    );
+    return payload.isFavorite;
   },
 
   async submitPlace(
     submission: PlaceSubmission
   ): Promise<SavedPlaceSubmission> {
-    await waitForMock();
-    const submissions = readStorage<SavedPlaceSubmission[]>(
-      STORAGE_KEYS.placeSubmissions,
-      []
-    );
-    const savedSubmission: SavedPlaceSubmission = {
-      ...submission,
-      id: createMockId("place"),
-      status: "pending",
-      submittedAt: new Date().toISOString()
-    };
-
-    writeStorage(STORAGE_KEYS.placeSubmissions, [
-      savedSubmission,
-      ...submissions
-    ]);
-    return savedSubmission;
+    const payload = await apiFetch<{ place: SavedPlaceSubmission }>("/places", {
+      method: "POST",
+      headers: jsonHeaders(),
+      body: JSON.stringify(submission)
+    });
+    return payload.place;
   },
 
   async getSubmissions(): Promise<SavedPlaceSubmission[]> {
-    await waitForMock();
-    return readStorage<SavedPlaceSubmission[]>(
-      STORAGE_KEYS.placeSubmissions,
-      []
-    );
-  },
-
-  getCategories() {
-    return placeCategories;
-  },
-
-  getAccessibilityFeatures() {
-    return accessibilityFeatures;
+    return [];
   }
 };

@@ -28,8 +28,8 @@ interface RegisterPayload extends SignInPayload {
 interface AuthContextValue {
   status: AuthStatus;
   user: AuthUser | null;
-  signIn: (payload: SignInPayload) => Promise<{ error?: string }>;
-  register: (payload: RegisterPayload) => Promise<{ error?: string }>;
+  signIn: (payload: SignInPayload) => Promise<{ user?: AuthUser; error?: string }>;
+  register: (payload: RegisterPayload) => Promise<{ user?: AuthUser; error?: string }>;
   forgotPassword: (email: string) => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
   refreshSession: () => Promise<void>;
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(authUser);
         setStatus("authenticated");
       });
-      return {};
+      return { user: authUser };
     } catch (error) {
       return {
         error: error instanceof Error ? error.message : "No se pudo iniciar sesión."
@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(authUser);
         setStatus("authenticated");
       });
-      return {};
+      return { user: authUser };
     } catch (error) {
       return {
         error: error instanceof Error ? error.message : "No se pudo crear la cuenta."

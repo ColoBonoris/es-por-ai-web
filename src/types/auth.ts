@@ -1,6 +1,6 @@
 import type { UserPreferences } from "@/types/domain";
 
-export type UserRole = "student" | "editor";
+export type UserRole = "CLIENT" | "ADMIN";
 
 export interface AuthUser {
   id: string;

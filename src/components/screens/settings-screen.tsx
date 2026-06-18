@@ -5,11 +5,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { FilterChip } from "@/components/ui/filter-chip";
-import { getFeatureLabel } from "@/mocks/app-data";
-import { placeService } from "@/services/place-service";
+import {
+  getFeatureLabel,
+  metadataService
+} from "@/services/metadata-service";
 import { userService } from "@/services/user-service";
 import type {
   AccessibilityFeature,
+  FeatureDefinition,
   PermissionPreference,
   ThemePreference,
   UserProfile,
@@ -72,12 +75,16 @@ export function SettingsScreen() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [message, setMessage] = useState("");
   const [toastMessage, setToastMessage] = useState("");
-  const features = placeService.getAccessibilityFeatures();
+  const [features, setFeatures] = useState<FeatureDefinition[]>([]);
 
   useEffect(() => {
     async function loadSettings() {
-      const nextProfile = await userService.getProfile();
+      const [nextProfile, nextFeatures] = await Promise.all([
+        userService.getProfile(),
+        metadataService.getAccessibilityFeatures()
+      ]);
       setProfile(nextProfile);
+      setFeatures(nextFeatures);
     }
 
     void loadSettings();

@@ -1,22 +1,64 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-import { SESSION_COOKIE_NAME } from "@/lib/auth/constants";
+import { joinApiUrl } from "@/lib/api-url";
+import type { AuthUser } from "@/types/auth";
 
-export function proxy(request: NextRequest) {
-  const sessionCookie = request.cookies.get(SESSION_COOKIE_NAME)?.value;
+const DEFAULT_API_BASE_URL = "http://localhost:3001/api/v1";
 
-  if (!sessionCookie) {
+interface AuthResponse {
+  user: AuthUser | null;
+}
+
+export async function proxy(request: NextRequest) {
+  const user = await getSessionUser(request);
+
+  if (!user) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirectTo", request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
   }
 
+  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
+
+  if (user.role === "ADMIN" && !isAdminRoute) {
+    return NextResponse.redirect(new URL("/admin", request.url));
+  }
+
   return NextResponse.next();
+}
+
+async function getSessionUser(request: NextRequest) {
+  try {
+    const response = await fetch(joinApiUrl(getApiBaseUrl(), "/auth/me"), {
+      headers: {
+        cookie: request.headers.get("cookie") ?? ""
+      },
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const payload = (await response.json()) as AuthResponse;
+    return payload.user;
+  } catch {
+    return null;
+  }
+}
+
+function getApiBaseUrl() {
+  return (
+    process.env.API_BASE_URL ??
+    process.env.NEXT_PUBLIC_API_BASE_URL ??
+    DEFAULT_API_BASE_URL
+  );
 }
 
 export const config = {
   matcher: [
+    "/admin/:path*",
     "/home/:path*",
     "/map/:path*",
     "/ai/:path*",

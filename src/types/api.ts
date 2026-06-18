@@ -7,6 +7,7 @@ import type {
   PlaceSubmission,
   Review,
   ReviewSubmission,
+  SavedPlaceSubmission,
   UserPreferences,
   UserProfile,
   UserSettings
@@ -45,6 +46,19 @@ export interface PaginatedResponse<T> {
 export interface AuthResponse {
   user: AuthUser | null;
 }
+
+export interface AdminUserListItem {
+  id: string;
+  name: string;
+  email: string;
+  role: AuthUser["role"];
+  avatar: string;
+  createdAt?: string;
+}
+
+export type AdminPlaceSubmissionListItem = SavedPlaceSubmission & {
+  submittedBy: string;
+};
 
 export interface LoginRequest {
   email: string;

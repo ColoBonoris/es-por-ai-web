@@ -8,8 +8,9 @@ import { SearchBar } from "@/components/forms/search-bar";
 import { PlaceCard } from "@/components/places/place-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { FilterChip } from "@/components/ui/filter-chip";
+import { metadataService } from "@/services/metadata-service";
 import { placeService } from "@/services/place-service";
-import type { AccessibilityFeature, Place } from "@/types/domain";
+import type { AccessibilityFeature, FeatureDefinition, Place } from "@/types/domain";
 
 const LeafletMap = dynamic(
   () => import("@/components/places/leaflet-map").then((mod) => mod.LeafletMap),
@@ -25,11 +26,19 @@ export function MapScreen() {
   const [selectedPlaceId, setSelectedPlaceId] = useState<string>();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedFeatures, setSelectedFeatures] = useState<AccessibilityFeature[]>([]);
-  const categories = placeService.getCategories();
-  const features = placeService.getAccessibilityFeatures();
+  const [categories, setCategories] = useState<string[]>([]);
+  const [features, setFeatures] = useState<FeatureDefinition[]>([]);
 
   useEffect(() => {
-    void placeService.getPlaces().then(setPlaces);
+    void Promise.all([
+      placeService.getPlaces(),
+      metadataService.getCategories(),
+      metadataService.getAccessibilityFeatures()
+    ]).then(([nextPlaces, nextCategories, nextFeatures]) => {
+      setPlaces(nextPlaces);
+      setCategories(nextCategories);
+      setFeatures(nextFeatures);
+    });
   }, []);
 
   function toggleCategory(category: string) {

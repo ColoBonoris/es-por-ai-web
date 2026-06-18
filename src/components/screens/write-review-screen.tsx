@@ -8,9 +8,10 @@ import { TextareaField } from "@/components/forms/textarea-field";
 import { Button } from "@/components/ui/button";
 import { FilterChip } from "@/components/ui/filter-chip";
 import { StarRating } from "@/components/ui/star-rating";
+import { metadataService } from "@/services/metadata-service";
 import { placeService } from "@/services/place-service";
 import { reviewService } from "@/services/review-service";
-import type { AccessibilityFeature, Place } from "@/types/domain";
+import type { AccessibilityFeature, FeatureDefinition, Place } from "@/types/domain";
 
 const requiredReviewError = "Escribí una reseña breve antes de publicarla.";
 
@@ -21,12 +22,20 @@ export function WriteReviewScreen({ placeId }: { placeId: string }) {
   const [text, setText] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [features, setFeatures] = useState<AccessibilityFeature[]>([]);
+  const [accessibilityFeatures, setAccessibilityFeatures] = useState<
+    FeatureDefinition[]
+  >([]);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const accessibilityFeatures = placeService.getAccessibilityFeatures();
 
   useEffect(() => {
-    void placeService.getPlaceById(placeId).then(setPlace);
+    void Promise.all([
+      placeService.getPlaceById(placeId),
+      metadataService.getAccessibilityFeatures()
+    ]).then(([nextPlace, nextFeatures]) => {
+      setPlace(nextPlace);
+      setAccessibilityFeatures(nextFeatures);
+    });
   }, [placeId]);
 
   function toggleFeature(feature: AccessibilityFeature) {

@@ -1,45 +1,33 @@
-import { seedReviews } from "@/mocks/app-data";
 import type { Review, ReviewSubmission } from "@/types/domain";
-import {
-  createMockId,
-  readStorage,
-  STORAGE_KEYS,
-  waitForMock,
-  writeStorage
-} from "@/services/mock-storage";
-
-function getLocalReviews() {
-  return readStorage<Review[]>(STORAGE_KEYS.reviews, []);
-}
+import { apiFetch, jsonHeaders } from "@/services/api-client";
 
 export const reviewService = {
   async getReviewsForPlace(placeId: string): Promise<Review[]> {
-    await waitForMock();
-    return [...getLocalReviews(), ...seedReviews].filter(
-      (review) => review.placeId === placeId
+    const payload = await apiFetch<{ reviews: Review[] }>(
+      `/places/${placeId}/reviews`
     );
+    return payload.reviews;
   },
 
   async getRecentReviews(): Promise<Review[]> {
-    await waitForMock();
-    return [...getLocalReviews(), ...seedReviews].slice(0, 5);
+    const payload = await apiFetch<{ reviews: Review[] }>("/reviews/recent");
+    return payload.reviews;
   },
 
   async submitReview(submission: ReviewSubmission): Promise<Review> {
-    await waitForMock();
-    const review: Review = {
-      id: createMockId("review"),
-      placeId: submission.placeId,
-      userName: "María González",
-      userAvatar: "MG",
-      rating: submission.rating,
-      dateLabel: "Recién",
-      text: submission.text,
-      images: submission.images,
-      accessibilityFeedback: submission.accessibilityFeedback
-    };
-
-    writeStorage(STORAGE_KEYS.reviews, [review, ...getLocalReviews()]);
-    return review;
+    const payload = await apiFetch<{ review: Review }>(
+      `/places/${submission.placeId}/reviews`,
+      {
+        method: "POST",
+        headers: jsonHeaders(),
+        body: JSON.stringify({
+          rating: submission.rating,
+          text: submission.text,
+          images: submission.images,
+          accessibilityFeedback: submission.accessibilityFeedback
+        })
+      }
+    );
+    return payload.review;
   }
 };

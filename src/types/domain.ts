@@ -94,6 +94,10 @@ export interface PlaceSubmission {
   address: string;
   category: string;
   description: string;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
   badges: AccessibilityFeature[];
   images: string[];
   menuText?: string;
@@ -101,7 +105,7 @@ export interface PlaceSubmission {
 
 export interface SavedPlaceSubmission extends PlaceSubmission {
   id: string;
-  status: "pending";
+  status: "pending" | "approved" | "rejected";
   submittedAt: string;
 }
 

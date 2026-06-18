@@ -5,7 +5,7 @@ Este contrato define la superficie esperada para desarrollar el backend de `Es p
 ## Convenciones
 
 - Base path sugerido: `/api/v1`.
-- Autenticación: cookie HTTP-only de sesión.
+- Autenticación: cookies HTTP-only de access token y refresh token.
 - Requests y responses usan JSON.
 - Fechas en ISO 8601.
 - IDs como `string`.
@@ -101,7 +101,7 @@ Response `201`:
     "id": "user_123",
     "name": "María González",
     "email": "maria@email.com",
-    "role": "student",
+    "role": "CLIENT",
     "preferences": {
       "accessibilityFeatures": ["gluten_free", "pet_friendly"]
     }
@@ -130,7 +130,7 @@ Response `200`:
     "id": "user_123",
     "name": "María González",
     "email": "demo@esporai.dev",
-    "role": "student"
+    "role": "CLIENT"
   }
 }
 ```
@@ -145,7 +145,7 @@ Response `200`:
 { "ok": true }
 ```
 
-### GET `/auth/session`
+### GET `/auth/me`
 
 Response `200`:
 
@@ -163,7 +163,7 @@ o:
     "id": "user_123",
     "name": "María González",
     "email": "demo@esporai.dev",
-    "role": "student"
+    "role": "CLIENT"
   }
 }
 ```
@@ -351,6 +351,10 @@ Request:
   "address": "Calle 10 N° 123",
   "category": "Cafetería",
   "description": "Descripción breve.",
+  "coordinates": {
+    "lat": -34.92145,
+    "lng": -57.95453
+  },
   "badges": ["gluten_free"],
   "images": ["https://..."],
   "menuText": "Opcional"
@@ -373,6 +377,7 @@ Response `201`:
 Reglas:
 
 - `name`, `address` y `category` son obligatorios.
+- `coordinates` es obligatorio y sale de la selección manual en el mapa.
 - `verified` no se acepta en el request.
 - El estado inicial es `pending`.
 
@@ -506,6 +511,78 @@ Response `200`:
   ]
 }
 ```
+
+## Admin
+
+Todas las rutas requieren sesión `ADMIN`.
+
+### GET `/admin/users`
+
+Query params:
+
+- `page?: number`
+- `pageSize?: number`
+- `query?: string`
+
+Response `200`: listado paginado de usuarios.
+
+### GET `/admin/place-submissions`
+
+Query params:
+
+- `page?: number`
+- `pageSize?: number`
+- `query?: string`
+
+Response `200`:
+
+```json
+{
+  "data": [
+    {
+      "id": "place_123",
+      "name": "Nuevo café",
+      "address": "Calle 10 N° 123",
+      "category": "Cafetería",
+      "description": "Descripción breve.",
+      "coordinates": {
+        "lat": -34.92145,
+        "lng": -57.95453
+      },
+      "badges": ["gluten_free"],
+      "images": [],
+      "status": "pending",
+      "submittedAt": "2026-06-18T00:00:00.000Z",
+      "submittedBy": "user_123"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "pageSize": 10,
+    "total": 1,
+    "totalPages": 1
+  }
+}
+```
+
+### POST `/admin/place-submissions/:submissionId/approve`
+
+Request:
+
+```json
+{
+  "coordinates": {
+    "lat": -34.92145,
+    "lng": -57.95453
+  }
+}
+```
+
+Response `201`: crea el lugar publicado y marca la solicitud como `approved`.
+
+### POST `/admin/place-submissions/:submissionId/reject`
+
+Response `201`: marca la solicitud como `rejected` sin publicar el lugar.
 
 ## Assistant Placeholder
 

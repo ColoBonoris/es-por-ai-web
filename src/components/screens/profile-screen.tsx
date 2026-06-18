@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { PlaceCard } from "@/components/places/place-card";
 import { ReviewCard } from "@/components/places/review-card";
 import { Badge } from "@/components/ui/badge";
-import { getFeatureLabel } from "@/mocks/app-data";
+import { getFeatureLabel } from "@/services/metadata-service";
 import { placeService } from "@/services/place-service";
 import { reviewService } from "@/services/review-service";
 import { userService } from "@/services/user-service";

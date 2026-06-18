@@ -2,25 +2,29 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import { TextField } from "@/components/forms/text-field";
 import { Button } from "@/components/ui/button";
 import { FilterChip } from "@/components/ui/filter-chip";
-import { placeService } from "@/services/place-service";
+import { metadataService } from "@/services/metadata-service";
 import { useAuth } from "@/providers/auth-provider";
-import type { AccessibilityFeature } from "@/types/domain";
+import type { AccessibilityFeature, FeatureDefinition } from "@/types/domain";
 
 export function RegisterScreen() {
   const router = useRouter();
   const { register } = useAuth();
-  const features = placeService.getAccessibilityFeatures();
+  const [features, setFeatures] = useState<FeatureDefinition[]>([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [preferences, setPreferences] = useState<AccessibilityFeature[]>([]);
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    void metadataService.getAccessibilityFeatures().then(setFeatures);
+  }, []);
 
   function togglePreference(feature: AccessibilityFeature) {
     setPreferences((current) =>

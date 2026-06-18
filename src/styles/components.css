@@ -111,6 +111,34 @@
   display: none;
 }
 
+.admin-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+}
+
+.admin-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-5);
+  border-right: 1px solid var(--border);
+  background: var(--card);
+}
+
+.admin-main {
+  min-width: 0;
+  min-height: 100vh;
+  padding: var(--space-7);
+}
+
+.admin-main:focus {
+  outline: none;
+}
+
 .button,
 .icon-button,
 .filter-chip {
@@ -718,11 +746,13 @@ a.button {
 }
 
 @media (max-width: 860px) {
-  .app-shell {
+  .app-shell,
+  .admin-shell {
     display: block;
   }
 
-  .app-sidebar {
+  .app-sidebar,
+  .admin-sidebar {
     display: none;
   }
 
@@ -744,7 +774,8 @@ a.button {
     height: 34px;
   }
 
-  .app-main {
+  .app-main,
+  .admin-main {
     padding: var(--space-5) var(--space-5) calc(var(--mobile-nav-height) + var(--space-5));
   }
 

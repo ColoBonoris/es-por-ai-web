@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { StarRating } from "@/components/ui/star-rating";
-import { getFeatureLabel } from "@/mocks/app-data";
+import { getFeatureLabel } from "@/services/metadata-service";
 import { placeService } from "@/services/place-service";
 import { reviewService } from "@/services/review-service";
 import type { Place, Review } from "@/types/domain";
@@ -53,7 +53,10 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
       return;
     }
 
-    const isFavorite = await placeService.toggleFavorite(place.id);
+    const isFavorite = await placeService.toggleFavorite(
+      place.id,
+      !place.isFavorite
+    );
     setPlace({
       ...place,
       isFavorite

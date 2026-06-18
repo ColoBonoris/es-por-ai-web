@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Check, Heart, MapPin, Star } from "lucide-react";
 
-import { getFeatureLabel } from "@/mocks/app-data";
+import { getFeatureLabel } from "@/services/metadata-service";
 import type { Place } from "@/types/domain";
 import { Badge } from "@/components/ui/badge";
 

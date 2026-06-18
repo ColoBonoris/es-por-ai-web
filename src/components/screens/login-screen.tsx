@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 import { TextField } from "@/components/forms/text-field";
+import { resolvePostLoginRoute } from "@/lib/auth/routes";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/auth-provider";
 
@@ -17,10 +18,6 @@ export function LoginScreen() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const redirectTo = searchParams.get("redirectTo");
-  const safeRedirect =
-    redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")
-      ? redirectTo
-      : "/home";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,7 +32,7 @@ export function LoginScreen() {
       return;
     }
 
-    router.push(safeRedirect);
+    router.push(result.user ? resolvePostLoginRoute(result.user, redirectTo) : "/home");
     router.refresh();
   }
 
@@ -80,7 +77,10 @@ export function LoginScreen() {
             {isSubmitting ? "Ingresando..." : "Iniciar sesión"}
           </Button>
           <p className="field-helper">
-            Demo: <strong>demo@esporai.dev</strong> / <strong>Acceso123!</strong>
+            Cleinte demo: <strong>demo@esporai.dev</strong> / <strong>Acceso123!</strong>
+          </p>
+          <p className="field-helper">
+            Admin demo: <strong>admin@esporai.dev</strong> / <strong>Acceso123!</strong>
           </p>
           <p className="field-error" role="alert">
             {error}
