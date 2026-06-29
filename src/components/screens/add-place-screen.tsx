@@ -29,6 +29,13 @@ const LocationPicker = dynamic(
   }
 );
 
+const APPROXIMATE_LA_PLATA_COORDINATES = {
+  lat: -34.92145,
+  lng: -57.95453
+};
+
+const approximateLocationNote = "Ubicación aproximada pendiente de revisión.";
+
 export function AddPlaceScreen() {
   const [categories, setCategories] = useState<string[]>([]);
   const [features, setFeatures] = useState<FeatureDefinition[]>([]);
@@ -72,9 +79,9 @@ export function AddPlaceScreen() {
     setError("");
     setHasTriedSubmit(true);
 
-    if (!name.trim() || !address.trim() || !category || !coordinates) {
+    if (!name.trim() || !address.trim() || !category) {
       setError(
-        "Completá nombre, dirección, categoría y ubicación para enviar el lugar."
+        "Completá nombre, dirección y categoría para enviar el lugar."
       );
       return;
     }
@@ -82,16 +89,25 @@ export function AddPlaceScreen() {
     setIsSubmitting(true);
 
     try {
+      const usesApproximateLocation = !coordinates;
+      const normalizedDescription = description.trim();
+      const submissionDescription = usesApproximateLocation
+        ? [normalizedDescription, approximateLocationNote].filter(Boolean).join("\n\n")
+        : normalizedDescription;
       const submission = await placeService.submitPlace({
         name,
         address,
         category,
-        description,
-        coordinates,
+        description: submissionDescription,
+        coordinates: coordinates ?? APPROXIMATE_LA_PLATA_COORDINATES,
         badges: selectedFeatures,
         images
       });
-      setMessage(`"${submission.name}" quedó pendiente de aprobación.`);
+      setMessage(
+        usesApproximateLocation
+          ? `"${submission.name}" quedó pendiente de aprobación con ubicación aproximada.`
+          : `"${submission.name}" quedó pendiente de aprobación.`
+      );
       setName("");
       setAddress("");
       setCategory("");
@@ -115,9 +131,6 @@ export function AddPlaceScreen() {
     : undefined;
   const categoryError = hasTriedSubmit && !category
     ? "Elegí una categoría."
-    : undefined;
-  const locationError = hasTriedSubmit && !coordinates
-    ? "Elegí la ubicación en el mapa."
     : undefined;
 
   return (
@@ -204,12 +217,19 @@ export function AddPlaceScreen() {
 
         <section className="form-section" aria-labelledby="place-location-title">
           <h2 id="place-location-title">Ubicación</h2>
+          <p className="field-helper">
+            Podés marcar el punto en el mapa o continuar solo con la dirección escrita.
+          </p>
           <LocationPicker value={coordinates} onChange={setCoordinates} />
-          {locationError ? (
-            <p className="field-error" role="alert">
-              {locationError}
+          {coordinates ? (
+            <Button type="button" variant="ghost" onClick={() => setCoordinates(null)}>
+              Quitar punto seleccionado
+            </Button>
+          ) : (
+            <p className="location-picker__notice" role="status">
+              {approximateLocationNote}
             </p>
-          ) : null}
+          )}
         </section>
 
         <section className="form-section" aria-labelledby="place-accessibility-title">

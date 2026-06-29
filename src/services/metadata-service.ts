@@ -57,6 +57,13 @@ export function getFeatureLabel(featureId: FeatureDefinition["id"]) {
   );
 }
 
+export function getFeatureShortLabel(featureId: FeatureDefinition["id"]) {
+  return (
+    fallbackAccessibilityFeatures.find((feature) => feature.id === featureId)?.shortLabel ??
+    getFeatureLabel(featureId)
+  );
+}
+
 export const metadataService = {
   async getCategories() {
     try {

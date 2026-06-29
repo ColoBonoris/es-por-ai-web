@@ -2,7 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Check, Heart, MapPin, Star } from "lucide-react";
 
-import { getFeatureLabel } from "@/services/metadata-service";
+import {
+  getFeatureLabel,
+  getFeatureShortLabel
+} from "@/services/metadata-service";
 import type { Place } from "@/types/domain";
 import { Badge } from "@/components/ui/badge";
 
@@ -54,7 +57,9 @@ export function PlaceCard({ place, compact, reason }: PlaceCardProps) {
 
           <div className="badge-row" aria-label="Características">
             {place.badges.slice(0, compact ? 2 : 3).map((badge) => (
-              <Badge key={badge}>{getFeatureLabel(badge)}</Badge>
+              <Badge key={badge}>
+                {compact ? getFeatureShortLabel(badge) : getFeatureLabel(badge)}
+              </Badge>
             ))}
           </div>
 

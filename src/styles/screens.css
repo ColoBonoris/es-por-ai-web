@@ -22,6 +22,11 @@
   gap: var(--space-4);
 }
 
+.section-header > div {
+  display: grid;
+  gap: var(--space-1);
+}
+
 .section-header p {
   color: var(--muted);
 }
@@ -412,6 +417,15 @@
   font-weight: 600;
 }
 
+.location-picker__notice {
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--secondary);
+  color: var(--foreground);
+  font-weight: 600;
+}
+
 .map-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 380px;
@@ -510,6 +524,7 @@
 }
 
 .profile-card {
+  align-self: start;
   display: grid;
   justify-items: center;
   gap: var(--space-3);
@@ -523,7 +538,7 @@
   height: 88px;
   border-radius: 50%;
   background: var(--accent);
-  color: #ffffff;
+  color: var(--accent-foreground);
   font-size: 1.5rem;
   font-weight: 700;
 }
@@ -748,7 +763,7 @@
 
 .settings-switch[aria-checked="true"] .settings-switch__thumb {
   transform: translateX(26px);
-  background: #ffffff;
+  background: var(--accent-foreground);
 }
 
 .permission-row {
@@ -786,7 +801,16 @@
 
 .permission-status.is-enabled {
   background: var(--success);
-  color: #ffffff;
+  color: var(--success-foreground);
+}
+
+.permission-summary .permission-row:hover {
+  background: transparent;
+}
+
+.permission-summary__action {
+  padding: var(--space-4);
+  border-top: 1px solid var(--border);
 }
 
 .more-grid {
@@ -851,7 +875,7 @@
 
 .chat-message--user .chat-bubble {
   background: var(--accent);
-  color: #ffffff;
+  color: var(--accent-foreground);
 }
 
 .chat-form {

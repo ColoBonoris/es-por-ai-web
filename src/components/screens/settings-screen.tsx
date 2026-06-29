@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, ChevronRight, Palette, Shield, Smartphone } from "lucide-react";
+import { Bell, Palette, Shield, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -303,15 +303,11 @@ export function SettingsScreen() {
           <Smartphone aria-hidden="true" />
           <h2 id="permissions-title">Permisos</h2>
         </div>
-        <div className="settings-card settings-card--list">
+        <div className="settings-card settings-card--list permission-summary">
           {permissionRows.map((permission) => (
-            <Link
+            <div
               key={permission.key}
-              href="/permissions"
               className="permission-row"
-              aria-label={`${permission.label}: ${
-                profile.settings.permissions[permission.key] ? "permitido" : "pendiente"
-              }. Revisar permisos`}
             >
               <span>
                 <strong>{permission.label}</strong>
@@ -325,10 +321,14 @@ export function SettingsScreen() {
                 >
                   {profile.settings.permissions[permission.key] ? "Permitido" : "Pendiente"}
                 </span>
-                <ChevronRight aria-hidden="true" />
               </span>
-            </Link>
+            </div>
           ))}
+          <div className="permission-summary__action">
+            <Link href="/permissions" className="button button--ghost">
+              Gestionar permisos
+            </Link>
+          </div>
         </div>
       </section>
 
