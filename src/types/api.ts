@@ -91,6 +91,7 @@ export interface UpdatePermissionsRequest {
 }
 
 export interface PlaceListQuery {
+  filter?: "recommended";
   query?: string;
   category?: string;
   features?: AccessibilityFeature[];

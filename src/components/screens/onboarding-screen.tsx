@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Heart, Map, MessageSquare } from "lucide-react";
 
+import { BrandLogo } from "@/components/app/brand-logo";
+
 const slides = [
   {
     title: "Descubrí lugares",
@@ -24,7 +26,7 @@ export function OnboardingScreen() {
     <main id="main-content" className="onboarding-page" tabIndex={-1}>
       <section className="onboarding-panel" aria-labelledby="onboarding-title">
         <div className="page-header">
-          <p className="badge badge--accent">Es por AI</p>
+          <BrandLogo className="onboarding-logo" showWordmark />
           <h1 id="onboarding-title">Una forma simple de descubrir lugares accesibles</h1>
           <p>
             Un MVP web para explorar, reseñar, guardar favoritos y pedir recomendaciones

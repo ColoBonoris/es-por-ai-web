@@ -12,6 +12,17 @@ export const placeService = {
     return payload.data;
   },
 
+  async getRecommendedPlaces(): Promise<Place[]> {
+    try {
+      const payload = await apiFetch<PaginatedResponse<Place>>(
+        "/places?filter=recommended"
+      );
+      return payload.data;
+    } catch {
+      return this.getPlaces();
+    }
+  },
+
   async getPlaceById(placeId: string): Promise<Place | null> {
     try {
       const payload = await apiFetch<PlaceResponse>(`/places/${placeId}`);

@@ -3,9 +3,11 @@ export type AccessibilityFeature =
   | "gluten_free"
   | "vegetarian"
   | "vegan"
-  | "kosher"
   | "pet_friendly"
-  | "visual_accessibility";
+  | "visual_accessibility"
+  | "accessible_bathroom"
+  | "ramp_available"
+  | "quiet_environment";
 
 export type ThemePreference = "light" | "dark" | "high-contrast";
 

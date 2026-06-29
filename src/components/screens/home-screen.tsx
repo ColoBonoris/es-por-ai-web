@@ -26,7 +26,7 @@ export function HomeScreen() {
     async function loadHome() {
       try {
         const [nextPlaces, nextReviews, nextProfile] = await Promise.all([
-          placeService.getPlaces(),
+          placeService.getRecommendedPlaces(),
           reviewService.getRecentReviews(),
           userService.getProfile()
         ]);
@@ -89,8 +89,8 @@ export function HomeScreen() {
           <section className="place-list" aria-labelledby="recommendations-title">
             <div className="section-header">
               <div>
-                <h2 id="recommendations-title">Recomendaciones del día</h2>
-                <p>Lugares destacados con reseñas y atributos útiles.</p>
+                <h2 id="recommendations-title">Recomendaciones para vos</h2>
+                <p>Lugares sugeridos según tus preferencias y actividad.</p>
               </div>
               <Link href="/places/new" className="button button--ghost">
                 <Plus aria-hidden="true" size={18} />

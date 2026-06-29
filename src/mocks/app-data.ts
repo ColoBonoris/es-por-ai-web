@@ -28,11 +28,6 @@ export const accessibilityFeatures: FeatureDefinition[] = [
     shortLabel: "Vegano"
   },
   {
-    id: "kosher",
-    label: "Kosher",
-    shortLabel: "Kosher"
-  },
-  {
     id: "pet_friendly",
     label: "Acepta mascotas",
     shortLabel: "Mascotas"
@@ -41,6 +36,21 @@ export const accessibilityFeatures: FeatureDefinition[] = [
     id: "visual_accessibility",
     label: "Accesibilidad visual",
     shortLabel: "Acc. visual"
+  },
+  {
+    id: "accessible_bathroom",
+    label: "Baño accesible",
+    shortLabel: "Baño acc."
+  },
+  {
+    id: "ramp_available",
+    label: "Rampa disponible",
+    shortLabel: "Rampa"
+  },
+  {
+    id: "quiet_environment",
+    label: "Espacio silencioso",
+    shortLabel: "Silencioso"
   }
 ];
 
@@ -52,6 +62,9 @@ export const placeCategories = [
   "Heladería",
   "Comida saludable",
   "Librería",
+  "Farmacia",
+  "Supermercado",
+  "Centro cultural",
   "Otro"
 ];
 
@@ -81,7 +94,7 @@ export const seedPlaces: Place[] = [
     ],
     rating: 4.8,
     reviewCount: 127,
-    badges: ["vegetarian", "pet_friendly", "wheelchair"],
+    badges: ["vegetarian", "pet_friendly", "wheelchair", "quiet_environment"],
     verified: true,
     distance: "A 8 cuadras",
     coordinates: { lat: -34.92145, lng: -57.95453 }
@@ -102,7 +115,7 @@ export const seedPlaces: Place[] = [
     ],
     rating: 4.6,
     reviewCount: 89,
-    badges: ["gluten_free"],
+    badges: ["gluten_free", "accessible_bathroom"],
     verified: true,
     distance: "A 1.2 km",
     coordinates: { lat: -34.9186, lng: -57.9488 }
@@ -123,7 +136,7 @@ export const seedPlaces: Place[] = [
     ],
     rating: 4.9,
     reviewCount: 203,
-    badges: ["vegetarian", "vegan", "gluten_free"],
+    badges: ["vegetarian", "vegan", "gluten_free", "quiet_environment"],
     verified: false,
     distance: "A 900 m",
     coordinates: { lat: -34.9144, lng: -57.9538 }
@@ -144,7 +157,7 @@ export const seedPlaces: Place[] = [
     ],
     rating: 4.7,
     reviewCount: 156,
-    badges: ["gluten_free"],
+    badges: ["gluten_free", "ramp_available"],
     verified: true,
     distance: "A 650 m",
     coordinates: { lat: -34.9266, lng: -57.9603 }
@@ -165,7 +178,7 @@ export const seedPlaces: Place[] = [
     ],
     rating: 4.5,
     reviewCount: 98,
-    badges: ["pet_friendly"],
+    badges: ["pet_friendly", "ramp_available"],
     verified: false,
     distance: "A 1.8 km",
     coordinates: { lat: -34.9127, lng: -57.9468 }

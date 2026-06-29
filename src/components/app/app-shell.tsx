@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import type { ReactNode } from "react";
 
 import { AppNavigation } from "@/components/app/app-navigation";
+import { BrandLogo } from "@/components/app/brand-logo";
 import { MobileBottomNav } from "@/components/app/mobile-bottom-nav";
 import { IconButton } from "@/components/ui/icon-button";
 import { useAuth } from "@/providers/auth-provider";
@@ -31,7 +32,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="app-shell">
       <aside className="app-sidebar">
         <div className="app-brand">
-          <span aria-hidden="true">AI</span>
+          <BrandLogo decorative />
           <div>
             <strong>Es por AI</strong>
             <small>Descubrir lugares</small>
@@ -49,7 +50,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <div className="app-shell__content">
         <header className="app-topbar">
           <div className="app-brand app-brand--compact">
-            <span aria-hidden="true">AI</span>
+            <BrandLogo decorative />
             <strong>Es por AI</strong>
           </div>
           <IconButton label="Cerrar sesión" onClick={handleSignOut}>

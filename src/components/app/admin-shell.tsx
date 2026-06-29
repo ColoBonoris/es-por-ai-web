@@ -4,6 +4,7 @@ import { LogOut, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
+import { BrandLogo } from "@/components/app/brand-logo";
 import { IconButton } from "@/components/ui/icon-button";
 import { useAuth } from "@/providers/auth-provider";
 
@@ -27,7 +28,7 @@ export function AdminShell({
     <div className="admin-shell">
       <aside className="admin-sidebar">
         <div className="app-brand">
-          <span aria-hidden="true">AI</span>
+          <BrandLogo decorative />
           <div>
             <strong>Es por AI</strong>
             <small>Admin</small>
@@ -49,7 +50,7 @@ export function AdminShell({
       <div>
         <header className="app-topbar">
           <div className="app-brand app-brand--compact">
-            <span aria-hidden="true">AI</span>
+            <BrandLogo decorative />
             <strong>Admin</strong>
           </div>
           <IconButton label="Cerrar sesión" onClick={handleSignOut}>

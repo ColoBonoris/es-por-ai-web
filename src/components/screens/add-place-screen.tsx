@@ -167,7 +167,7 @@ export function AddPlaceScreen() {
             />
           </div>
           <fieldset
-            className="photo-field"
+            className="photo-field category-field"
             aria-describedby={categoryError ? "place-category-error" : undefined}
             aria-invalid={categoryError ? true : undefined}
           >

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
+import { BrandLogo } from "@/components/app/brand-logo";
 import { TextField } from "@/components/forms/text-field";
 import { resolvePostLoginRoute } from "@/lib/auth/routes";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ export function LoginScreen() {
   return (
     <main id="main-content" className="auth-page" tabIndex={-1}>
       <section className="auth-panel" aria-labelledby="login-title">
+        <BrandLogo className="auth-logo" showWordmark />
         <div className="page-header">
           <h1 id="login-title">Bienvenido</h1>
           <p>Ingresá a tu cuenta para continuar explorando lugares.</p>

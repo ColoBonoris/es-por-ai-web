@@ -23,11 +23,6 @@ export const fallbackAccessibilityFeatures: FeatureDefinition[] = [
     shortLabel: "Vegano"
   },
   {
-    id: "kosher",
-    label: "Kosher",
-    shortLabel: "Kosher"
-  },
-  {
     id: "pet_friendly",
     label: "Acepta mascotas",
     shortLabel: "Mascotas"
@@ -36,6 +31,21 @@ export const fallbackAccessibilityFeatures: FeatureDefinition[] = [
     id: "visual_accessibility",
     label: "Accesibilidad visual",
     shortLabel: "Acc. visual"
+  },
+  {
+    id: "accessible_bathroom",
+    label: "Baño accesible",
+    shortLabel: "Baño acc."
+  },
+  {
+    id: "ramp_available",
+    label: "Rampa disponible",
+    shortLabel: "Rampa"
+  },
+  {
+    id: "quiet_environment",
+    label: "Espacio silencioso",
+    shortLabel: "Silencioso"
   }
 ];
 
@@ -47,6 +57,9 @@ export const fallbackPlaceCategories = [
   "Heladería",
   "Comida saludable",
   "Librería",
+  "Farmacia",
+  "Supermercado",
+  "Centro cultural",
   "Otro"
 ];
 
