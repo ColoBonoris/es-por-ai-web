@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   X
 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,8 @@ const initialPagination: PaginationMeta = {
 type ReviewModalMode = "review" | "approve" | "reject";
 
 export function AdminUsersScreen() {
+  const searchParams = useSearchParams();
+  const activeTab = searchParams.get("tab") === "places" ? "places" : "users";
   const [users, setUsers] = useState<AdminUserListItem[]>([]);
   const [pagination, setPagination] = useState<PaginationMeta>(initialPagination);
   const [query, setQuery] = useState("");
@@ -273,226 +276,233 @@ export function AdminUsersScreen() {
     <div className="admin-page">
       <header className="page-header">
         <p className="badge badge--accent">Admin</p>
-        <h1>Usuarios</h1>
-        <p>Listado de cuentas registradas y roles asignados.</p>
+        <h1>{activeTab === "places" ? "Lugares" : "Usuarios"}</h1>
+        <p>
+          {activeTab === "places"
+            ? "Solicitudes pendientes de revisión y aprobación."
+            : "Listado de cuentas registradas y roles asignados."}
+        </p>
       </header>
 
-      <section className="admin-toolbar" aria-label="Filtros de usuarios">
-        <form className="admin-search" onSubmit={handleSearch}>
-          <label className="sr-only" htmlFor="admin-user-search">
-            Buscar usuarios
-          </label>
-          <Search aria-hidden="true" size={18} />
-          <input
-            id="admin-user-search"
-            type="search"
-            placeholder="Buscar por nombre o email"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-          />
-          <Button
-            type="submit"
-            variant="ghost"
-            isLoading={isLoading}
-            loadingLabel="Buscando"
-          >
-            Buscar
-          </Button>
-        </form>
-        <div className="admin-total" aria-live="polite">
-          <ShieldCheck aria-hidden="true" size={18} />
-          <span>{pagination.total} usuarios</span>
-        </div>
-      </section>
-
-      <section className="admin-table-wrap" aria-label="Tabla de usuarios">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Usuario</th>
-              <th>Email</th>
-              <th>Rol</th>
-              <th>Alta</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>
-                  <span className="admin-avatar" aria-hidden="true">
-                    {user.avatar}
-                  </span>
-                  <strong>{user.name}</strong>
-                </td>
-                <td>{user.email}</td>
-                <td>
-                  <span className="badge badge--neutral">{user.role}</span>
-                </td>
-                <td>{formatDate(user.createdAt)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {!isLoading && users.length === 0 ? (
-          <div className="admin-empty-state">
-            <h2>No hay usuarios para mostrar</h2>
-            <p>Cuando existan cuentas en la base, van a aparecer acá.</p>
-          </div>
-        ) : null}
-
-        {isLoading ? (
-          <LoadingState label="Cargando usuarios" size="compact" />
-        ) : null}
-        {error ? (
-          <p className="field-error" role="alert">
-            {error}
-          </p>
-        ) : null}
-      </section>
-
-      <footer className="admin-pagination" aria-label="Paginación de usuarios">
-        <Button
-          type="button"
-          variant="ghost"
-          disabled={!canGoBack || isLoading}
-          onClick={() => void loadUsers(pagination.page - 1)}
-        >
-          Anterior
-        </Button>
-        <span>
-          Página {pagination.page}
-          {pagination.totalPages > 0 ? ` de ${pagination.totalPages}` : ""}
-        </span>
-        <Button
-          type="button"
-          variant="ghost"
-          disabled={!canGoForward || isLoading}
-          onClick={() => void loadUsers(pagination.page + 1)}
-        >
-          Siguiente
-        </Button>
-      </footer>
-
-      <section className="admin-section" aria-labelledby="pending-places-title">
-        <header className="section-header">
-          <div>
-            <p className="badge badge--accent">Pendientes</p>
-            <h2 id="pending-places-title">Lugares a aprobar</h2>
-            <p>Solicitudes enviadas por usuarios desde Agregar lugar.</p>
-          </div>
-        </header>
-
-        <div className="admin-toolbar" aria-label="Filtros de lugares pendientes">
-          <form className="admin-search" onSubmit={handleSubmissionsSearch}>
-            <label className="sr-only" htmlFor="admin-submission-search">
-              Buscar lugares pendientes
-            </label>
-            <Search aria-hidden="true" size={18} />
-            <input
-              id="admin-submission-search"
-              type="search"
-              placeholder="Buscar por nombre, dirección o categoría"
-              value={submissionsQuery}
-              onChange={(event) => setSubmissionsQuery(event.target.value)}
-            />
-            <Button
-              type="submit"
-              variant="ghost"
-              isLoading={areSubmissionsLoading}
-              loadingLabel="Buscando"
-            >
-              Buscar
-            </Button>
-          </form>
-          <div className="admin-total" aria-live="polite">
-            <ClipboardList aria-hidden="true" size={18} />
-            <span>{submissionsPagination.total} pendientes</span>
-          </div>
-        </div>
-
-        <section className="admin-table-wrap" aria-label="Tabla de lugares pendientes">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Lugar</th>
-                <th>Dirección</th>
-                <th>Categoría</th>
-                <th>Características</th>
-                <th>Enviado</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {submissions.map((submission) => (
-                <tr key={submission.id}>
-                  <td>
-                    <strong>{submission.name}</strong>
-                  </td>
-                  <td>{submission.address}</td>
-                  <td>{submission.category}</td>
-                  <td>{formatBadges(submission.badges)}</td>
-                  <td>{formatDate(submission.submittedAt)}</td>
-                  <td>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      icon={<Eye aria-hidden="true" size={18} />}
-                      onClick={() => openSubmissionReview(submission)}
-                    >
-                      Revisar
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {!areSubmissionsLoading && submissions.length === 0 ? (
-            <div className="admin-empty-state">
-              <h2>No hay lugares pendientes</h2>
-              <p>Cuando un usuario envíe un lugar, va a aparecer acá.</p>
+      {activeTab === "users" ? (
+        <>
+          <section className="admin-toolbar" aria-label="Filtros de usuarios">
+            <form className="admin-search" onSubmit={handleSearch}>
+              <label className="sr-only" htmlFor="admin-user-search">
+                Buscar usuarios
+              </label>
+              <Search aria-hidden="true" size={18} />
+              <input
+                id="admin-user-search"
+                type="search"
+                placeholder="Buscar por nombre o email"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+              />
+              <Button
+                type="submit"
+                variant="ghost"
+                isLoading={isLoading}
+                loadingLabel="Buscando"
+              >
+                Buscar
+              </Button>
+            </form>
+            <div className="admin-total" aria-live="polite">
+              <ShieldCheck aria-hidden="true" size={18} />
+              <span>{pagination.total} usuarios</span>
             </div>
-          ) : null}
+          </section>
 
-          {areSubmissionsLoading ? (
-            <LoadingState label="Cargando lugares pendientes" size="compact" />
-          ) : null}
-          {submissionsError ? (
-            <p className="field-error" role="alert">
-              {submissionsError}
-            </p>
-          ) : null}
-        </section>
+          <section className="admin-table-wrap" aria-label="Tabla de usuarios">
+            <table className="admin-table admin-table--users">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Email</th>
+                  <th>Rol</th>
+                  <th>Alta</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user.id}>
+                    <td>
+                      <span className="admin-avatar" aria-hidden="true">
+                        {user.avatar}
+                      </span>
+                      <strong>{user.name}</strong>
+                    </td>
+                    <td>{user.email}</td>
+                    <td>
+                      <span className="badge badge--neutral">{user.role}</span>
+                    </td>
+                    <td>{formatDate(user.createdAt)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
 
-        <footer
-          className="admin-pagination"
-          aria-label="Paginación de lugares pendientes"
+            {!isLoading && users.length === 0 ? (
+              <div className="admin-empty-state">
+                <h2>No hay usuarios para mostrar</h2>
+                <p>Cuando existan cuentas en la base, van a aparecer acá.</p>
+              </div>
+            ) : null}
+
+            {isLoading ? (
+              <LoadingState label="Cargando usuarios" size="compact" />
+            ) : null}
+            {error ? (
+              <p className="field-error" role="alert">
+                {error}
+              </p>
+            ) : null}
+          </section>
+
+          <footer className="admin-pagination" aria-label="Paginación de usuarios">
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={!canGoBack || isLoading}
+              onClick={() => void loadUsers(pagination.page - 1)}
+            >
+              Anterior
+            </Button>
+            <span>
+              Página {pagination.page}
+              {pagination.totalPages > 0 ? ` de ${pagination.totalPages}` : ""}
+            </span>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={!canGoForward || isLoading}
+              onClick={() => void loadUsers(pagination.page + 1)}
+            >
+              Siguiente
+            </Button>
+          </footer>
+        </>
+      ) : (
+        <section
+          className="admin-section admin-section--active"
+          aria-labelledby="pending-places-title"
         >
-          <Button
-            type="button"
-            variant="ghost"
-            disabled={!canSubmissionsGoBack || areSubmissionsLoading}
-            onClick={() => void loadSubmissions(submissionsPagination.page - 1)}
+          <h2 id="pending-places-title" className="sr-only">
+            Lugares a aprobar
+          </h2>
+
+          <div className="admin-toolbar" aria-label="Filtros de lugares pendientes">
+            <form className="admin-search" onSubmit={handleSubmissionsSearch}>
+              <label className="sr-only" htmlFor="admin-submission-search">
+                Buscar lugares pendientes
+              </label>
+              <Search aria-hidden="true" size={18} />
+              <input
+                id="admin-submission-search"
+                type="search"
+                placeholder="Buscar por nombre, dirección o categoría"
+                value={submissionsQuery}
+                onChange={(event) => setSubmissionsQuery(event.target.value)}
+              />
+              <Button
+                type="submit"
+                variant="ghost"
+                isLoading={areSubmissionsLoading}
+                loadingLabel="Buscando"
+              >
+                Buscar
+              </Button>
+            </form>
+            <div className="admin-total" aria-live="polite">
+              <ClipboardList aria-hidden="true" size={18} />
+              <span>{submissionsPagination.total} pendientes</span>
+            </div>
+          </div>
+
+          <section className="admin-table-wrap" aria-label="Tabla de lugares pendientes">
+            <table className="admin-table admin-table--places">
+              <thead>
+                <tr>
+                  <th>Lugar</th>
+                  <th>Dirección</th>
+                  <th>Categoría</th>
+                  <th>Características</th>
+                  <th>Enviado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {submissions.map((submission) => (
+                  <tr key={submission.id}>
+                    <td>
+                      <strong>{submission.name}</strong>
+                    </td>
+                    <td>{submission.address}</td>
+                    <td>{submission.category}</td>
+                    <td>{formatBadges(submission.badges)}</td>
+                    <td>{formatDate(submission.submittedAt)}</td>
+                    <td>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        icon={<Eye aria-hidden="true" size={18} />}
+                        onClick={() => openSubmissionReview(submission)}
+                      >
+                        Revisar
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {!areSubmissionsLoading && submissions.length === 0 ? (
+              <div className="admin-empty-state">
+                <h2>No hay lugares pendientes</h2>
+                <p>Cuando un usuario envíe un lugar, va a aparecer acá.</p>
+              </div>
+            ) : null}
+
+            {areSubmissionsLoading ? (
+              <LoadingState label="Cargando lugares pendientes" size="compact" />
+            ) : null}
+            {submissionsError ? (
+              <p className="field-error" role="alert">
+                {submissionsError}
+              </p>
+            ) : null}
+          </section>
+
+          <footer
+            className="admin-pagination"
+            aria-label="Paginación de lugares pendientes"
           >
-            Anterior
-          </Button>
-          <span>
-            Página {submissionsPagination.page}
-            {submissionsPagination.totalPages > 0
-              ? ` de ${submissionsPagination.totalPages}`
-              : ""}
-          </span>
-          <Button
-            type="button"
-            variant="ghost"
-            disabled={!canSubmissionsGoForward || areSubmissionsLoading}
-            onClick={() => void loadSubmissions(submissionsPagination.page + 1)}
-          >
-            Siguiente
-          </Button>
-        </footer>
-      </section>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={!canSubmissionsGoBack || areSubmissionsLoading}
+              onClick={() => void loadSubmissions(submissionsPagination.page - 1)}
+            >
+              Anterior
+            </Button>
+            <span>
+              Página {submissionsPagination.page}
+              {submissionsPagination.totalPages > 0
+                ? ` de ${submissionsPagination.totalPages}`
+                : ""}
+            </span>
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={!canSubmissionsGoForward || areSubmissionsLoading}
+              onClick={() => void loadSubmissions(submissionsPagination.page + 1)}
+            >
+              Siguiente
+            </Button>
+          </footer>
+        </section>
+      )}
 
       {selectedSubmission ? (
         <ReviewPlaceSubmissionModal
