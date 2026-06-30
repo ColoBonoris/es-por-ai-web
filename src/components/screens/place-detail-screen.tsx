@@ -132,7 +132,7 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
           </header>
 
           <section className="gallery" aria-label="Galería de fotos">
-            <Image src={place.images[0]} alt={place.name} width={720} height={520} priority />
+            <Image src={place.image} alt={place.name} width={720} height={520} priority />
             <div className="gallery__stack">
               {place.images.slice(1, 3).map((image, index) => (
                 <Image
