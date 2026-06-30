@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Check, Heart, MapPin, Star } from "lucide-react";
 
@@ -20,11 +19,9 @@ export function PlaceCard({ place, compact, reason }: PlaceCardProps) {
     <article className={compact ? "place-card place-card--compact" : "place-card"}>
       <Link href={`/places/${place.id}`} className="place-card__link">
         <div className="place-card__image">
-          <Image
+          <img
             src={place.image}
             alt={`Foto de ${place.name}`}
-            fill
-            sizes="(max-width: 768px) 35vw, 220px"
           />
         </div>
         <div className="place-card__body">

@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Image from "next/image";
 import Link from "next/link";
 import { ExternalLink, Heart, MapPin, Navigation, Share2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -132,15 +131,13 @@ export function PlaceDetailScreen({ placeId }: { placeId: string }) {
           </header>
 
           <section className="gallery" aria-label="Galería de fotos">
-            <Image src={place.image} alt={place.name} width={720} height={520} priority />
+            <img src={place.image} alt={place.name} />
             <div className="gallery__stack">
               {place.images.slice(1, 3).map((image, index) => (
-                <Image
+                <img
                   key={image}
                   src={image}
                   alt={`${place.name}, foto ${index + 2}`}
-                  width={420}
-                  height={250}
                 />
               ))}
             </div>
