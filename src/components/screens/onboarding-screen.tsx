@@ -29,7 +29,7 @@ export function OnboardingScreen() {
           <BrandLogo className="onboarding-logo" showWordmark />
           <h1 id="onboarding-title">Una forma simple de descubrir lugares accesibles</h1>
           <p>
-            Un MVP web para explorar, reseñar, guardar favoritos y pedir recomendaciones
+            Tu lugar para explorar, reseñar, guardar favoritos y pedir recomendaciones
             de puntos de interés en la ciudad.
           </p>
         </div>

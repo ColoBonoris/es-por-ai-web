@@ -43,7 +43,7 @@ export function PhotoUploadField({
     <fieldset className="photo-field" aria-describedby={helperId}>
       <legend>{label}</legend>
       <p id={helperId} className="field-helper">
-        Podés cargar hasta 6 fotos. En esta v1 se agregan imágenes mockeadas.
+        Podés cargar hasta 6 fotos.
       </p>
       <div className="photo-grid">
         {images.map((image, index) => (

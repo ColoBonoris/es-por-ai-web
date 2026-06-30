@@ -89,14 +89,14 @@ export function MoreScreen() {
       <section id="privacy" className="form-section" aria-labelledby="privacy-title">
         <h2 id="privacy-title">Política de privacidad</h2>
         <p>
-          Esta versión usa datos mockeados y almacenamiento local para simular el flujo.
+          Esta versión usa datos ficticios y los almacena para probar los flujos.
         </p>
       </section>
 
       <section id="terms" className="form-section" aria-labelledby="terms-title">
         <h2 id="terms-title">Términos y condiciones</h2>
         <p>
-          MVP educativo sin backend real. El contenido puede reemplazarse por textos legales finales.
+          MVP sin implementación ni uso real. Los datos no son tratados como reales.
         </p>
       </section>
 

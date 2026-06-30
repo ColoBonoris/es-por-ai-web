@@ -12,7 +12,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Es por AI",
-  description: "MVP accesible para descubrir y reseñar lugares de la ciudad."
+  description: "Una aplicación accesible para descubrir y reseñar lugares en tu ciudad."
 };
 
 export default function RootLayout({

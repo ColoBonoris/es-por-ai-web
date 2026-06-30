@@ -28,7 +28,7 @@ export function ForgotPasswordScreen() {
       return;
     }
 
-    setMessage("Listo. Si el correo existe, te enviamos instrucciones mockeadas.");
+    setMessage("Listo! Si el correo existe, te enviamos instrucciones para restablecer tu contraseña.");
     setIsSubmitting(false);
   }
 
@@ -37,7 +37,7 @@ export function ForgotPasswordScreen() {
       <section className="auth-panel" aria-labelledby="forgot-title">
         <div className="page-header">
           <h1 id="forgot-title">Recuperar contraseña</h1>
-          <p>Ingresá tu email y simulamos el envío de instrucciones.</p>
+          <p>Ingresá tu email y te enviaremos instrucciones para restablecer tu contraseña.</p>
         </div>
 
         <form className="auth-card" onSubmit={handleSubmit} noValidate>

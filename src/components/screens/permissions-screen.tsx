@@ -51,7 +51,7 @@ export function PermissionsScreen() {
       <header className="page-header">
         <p className="badge badge--accent">Permisos</p>
         <h1>Configurá permisos</h1>
-        <p>Son mockeados por ahora, pero la decisión queda persistida localmente.</p>
+        <p>No se usarán en esta versión preliminar, pero tus decisiones se almacenan.</p>
       </header>
 
       {isLoading ? (
